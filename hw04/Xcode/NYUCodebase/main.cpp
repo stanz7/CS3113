@@ -6,8 +6,14 @@
 #include <SDL_image.h>
 
 #include <vector>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+using namespace std;
+
 #include "Matrix.h"
 #include "ShaderProgram.h"
+#include "FlareMap.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -22,82 +28,81 @@
 
 
 SDL_Window* displayWindow;
+const Uint8 *keys = SDL_GetKeyboardState(NULL);
 enum GameMode {STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER, STATE_WIN};
 #define FIXED_TIMESTEP 0.0166666f
 #define MAX_TIMESTEPS 6
-
+#define TILE_SIZE 0.5f
+#define LEVEL_WIDTH 128
+#define LEVEL_HEIGHT 32
+#define spriteCountX 16
+#define spriteCountY 8
+FlareMap map;
+float gravity = 3.0f;
+GLuint tiles;
 
 GLuint LoadTexture(const char* filepath){
-        int w,h,comp;
-        unsigned char* image = stbi_load(filepath, &w, &h, &comp, STBI_rgb_alpha);
-        
-        if(image == NULL){
-                std::cout << "Unable to load image. Make sure the path is corret\n";
-                assert(false);
-            }
-        
-        GLuint retTexture;
-        glGenTextures(1, &retTexture);
-        glBindTexture(GL_TEXTURE_2D, retTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        
-        stbi_image_free(image);
-        return retTexture;
+    int w,h,comp;
+    unsigned char* image = stbi_load(filepath, &w, &h, &comp, STBI_rgb_alpha);
+    if(image == NULL){
+        std::cout << "Unable to load image. Make sure the path is corret\n";
+        assert(false);
+        
+    }
+    GLuint retTexture;
+    glGenTextures(1, &retTexture);
+    glBindTexture(GL_TEXTURE_2D, retTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    stbi_image_free(image);
+    return retTexture;
 }
 
 class SheetSprite{
 public:
-        unsigned int textureID;
-        float u;
-        float v;
-        float width;
-        float height;
-        float size;
+    unsigned int textureID;
+    float u;
+    float v;
+    float width;
+    float height;
+    float size;
+    int id;
     
-        SheetSprite();
-        SheetSprite(unsigned int textureID, float u, float v, float width, float height, float size) : textureID(textureID), u(u), v(v), width(width), height(height), size(size){}
-        
-        void Draw(ShaderProgram *program) const;
-       
+    SheetSprite();
+    SheetSprite(unsigned int textureID, int id, float size) : textureID(textureID), id(id), size(size) {
+        u = (float)(id % 30) / (float)30;
+        v = (float)(id / 30) / (float)30;
+        width = 1.0f / 30.0f;
+        height = 1.0f / 30.0f;
+    }
+    void Draw(ShaderProgram *program, float x, float y) {
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        float vertices[] = {
+            size * x, size * y,
+            size * x, (size * y) - size,
+            (size * x) + size, (size * y) - size,
+            size * x, size * y,
+            (size * x) + size, (size * y) - size,
+            (size * x) + size, size * y
+        };
+        GLfloat texCoords[] = {
+            u, v,
+            u, v + (height),
+            u + width, v + (height),
+            u, v,
+            u + width, v + (height),
+            u + width, v
+        };
+        glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+        glEnableVertexAttribArray(program->positionAttribute);
+        glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+        glEnableVertexAttribArray(program->texCoordAttribute);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDisableVertexAttribArray(program->positionAttribute);
+        glDisableVertexAttribArray(program->texCoordAttribute);
+    }
 };
-
-void SheetSprite::Draw(ShaderProgram *program) const {
-            glBindTexture(GL_TEXTURE_2D, textureID);
-            
-            GLfloat texCoords[] = {
-                    u, v+height,
-                    u+width, v,
-                    u, v,
-                    u+width, v,
-                    u, v+height,
-                    u+width, v+height
-                };
-            
-            
-            float aspect = width / height;
-            float vertices[] = {
-                    -0.5f * size * aspect, -0.5f * size,
-                    0.5f * size * aspect, 0.5f * size,
-                    -0.5f * size * aspect, 0.5f * size,
-                    0.5f * size * aspect, 0.5f * size,
-                    -0.5f * size * aspect, -0.5f * size ,
-                    0.5f * size * aspect, -0.5f * size};
-            
-            glUseProgram(program->programID);
-            
-            glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-            glEnableVertexAttribArray(program->positionAttribute);
-            glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-            glEnableVertexAttribArray(program->texCoordAttribute);
-            
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            
-            glDisableVertexAttribArray(program->positionAttribute);
-            glDisableVertexAttribArray(program->texCoordAttribute);
-        }
 
 
 void DrawText(ShaderProgram *program, GLuint fontTexture, std::string text, float size, float spacing) {
@@ -156,18 +161,15 @@ void DrawText(ShaderProgram *program, GLuint fontTexture, std::string text, floa
 
 class Vector3{
 public:
-        Vector3(float x, float y, float z):x(x), y(y), z(z){};
-        
-        float x;
-        float y;
-        float z;
+    Vector3(float x=0.0f, float y=0.0f, float z = 0.0f):x(x), y(y), z(z){};
+    float x;
+    float y;
+    float z;
 };
 
-float lerp(float v0, float v1, float t) {  //CHANGE THISS
-    return (1.0-t)*v0 + t*v1;
-}
 
-enum EntityType {ENTITY_PLAYER, ENTITY_ENEMY, ENTITY_COIN, ENTITY_STATIC};
+
+enum EntityType {ENTITY_PLAYER, ENTITY_ENEMY, ENTITY_STATIC};
 
 class Entity{
 public:
@@ -181,9 +183,71 @@ public:
     bool colRight;
     bool colTop;
     bool colBot;
+    bool isStatic;
+    bool isJump;
+    float limit = 0.0f;
     SheetSprite sprite;
     
-    Entity(const SheetSprite& sprite, float positionX, float positionY, float sizeX, float sizeY, float velocityX, float velocityY, float accelerationX, float accelerationY, EntityType entityType):sprite(sprite), position(positionX, positionY, 0.0f), size(sizeX*sprite.size*sprite.width/sprite.height, sizeY*sprite.size, 0.0f), velocity(velocityX, velocityY, 0.0f), acceleration(accelerationX, accelerationY, 0.0f), entityType(entityType){};
+    Entity() {};
+    
+    Entity(float x, float y, float width, float height, SheetSprite sprite, EntityType type, bool isStatic) : position(x,y), size(width, height), sprite(sprite), entityType(type), isStatic(isStatic) {}
+    
+
+    float lerp(float v0, float v1, float t) {
+        return (1.0-t)*v0 + t*v1;
+    }
+    
+    void Update(float elapsed, float grav) {
+        if (!isStatic){
+            if (isJump) {
+                colBot = false;
+                velocity.y = 3.0f;
+            }
+            velocity.x = lerp(velocity.x, 0.0f, elapsed);
+            velocity.y = lerp(velocity.y, 0.0f, elapsed);
+            velocity.x += acceleration.x * elapsed;
+            velocity.y += acceleration.y * elapsed;
+            if (colBot) {
+                isJump = false;
+                velocity.y = 0.0f;
+            }
+            position.x += velocity.x * elapsed;
+            if (colTop || (isJump && position.y >= limit)){
+                isJump = false;
+                velocity.y *= -1;
+            }
+            if (colLeft || colRight){
+                velocity.x = 0.0f;
+            }
+            position.y += velocity.y * elapsed;
+        }
+    }
+    
+    void jump() {
+        if (colBot){
+            isJump = true;
+            limit = position.y + velocity.y * 1.5f;
+        }
+    }
+    
+    bool collidesWith(const Entity& ent) {
+        return !(position.y - size.y / 2 > ent.position.y + ent.size.y / 2 ||
+                 position.y + size.y / 2 < ent.position.y - ent.size.y / 2 ||
+                 position.x - size.x / 2 > ent.position.x + ent.size.x / 2 ||
+                 position.x + size.x / 2 < ent.position.x - ent.size.x / 2);
+    }
+    
+    void Draw(ShaderProgram& program) {
+        if (entityType == ENTITY_PLAYER) {
+            Matrix modelMatrix;
+            Matrix viewMatrix;
+            viewMatrix.Translate(position.x, position.y, 0.0);
+            modelMatrix.Translate(position.x, position.y, 0.0f);
+            program.SetModelMatrix(modelMatrix);
+            program.SetViewMatrix(viewMatrix);
+        }
+        sprite.Draw(&program, position.x, position.y);
+    }
     
     bool CollisionX(Entity* entity) {
         if (position.x + size.x * 0.5 < (entity->position.x - entity->size.x * 0.5) || position.x - size.x * 0.5 > entity->position.x + entity->size.x * 0.5 || position.y + size.y * 0.5 < entity->position.y - entity->size.y * 0.5 || position.y - entity->size.y * 0.5 > entity->position.y + entity->size.y * 0.5) {
@@ -270,7 +334,7 @@ public:
             }
         }
     }
-    
+    /*
     void Render(ShaderProgram* program, Entity* player){
         
         Matrix projectionMatrix;
@@ -289,148 +353,166 @@ public:
         program->SetModelMatrix(modelMatrix);
         program->SetViewMatrix(viewMatrix);
         
-        sprite.Draw(program);
+        sprites.Draw(program);
     }
+     */
 };
-    
+
+Entity player;
+Entity enemy;
+
+
+void worldToTileCoords(float worldX, float worldY, int* gridX, int* gridY) {
+    *gridX = (int)(worldX / TILE_SIZE * 0.5);
+    *gridY = (int)(-worldY / TILE_SIZE * 0.5);
+}
+
     
 void setup(ShaderProgram* program){
-        SDL_Init(SDL_INIT_VIDEO);
-        displayWindow = SDL_CreateWindow("Space Invaders", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
-        SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
-        SDL_GL_MakeCurrent(displayWindow, context);
+    SDL_Init(SDL_INIT_VIDEO);
+    displayWindow = SDL_CreateWindow("Space Invaders", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+    SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
+    SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
         glewInit();
 #endif
-        
-        glViewport(0, 0, 1280, 720);
-        //glClearColor(0.00f/255.0f, 0.0f/255.0f, 0.0f/255.0f, 1.0f);
-        
-        program->Load(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-        
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glViewport(0, 0, 1280, 720);
+    //glClearColor(0.00f/255.0f, 0.0f/255.0f, 0.0f/255.0f, 1.0f);
+    program->Load(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glClearColor(0.455f, 0.0f, 0.416f, 1.0f);
+
 }
     
-void ProcessGameInput(SDL_Event* event, bool& done, std::vector<Entity>& bullets, Entity& player){
-        while (SDL_PollEvent(event)){
-                if(event->type == SDL_QUIT || event->type == SDL_WINDOWEVENT_CLOSE){
-                        done = true;
-                    }
+void ProcessGameInput(SDL_Event* event, bool& done){
+    while (SDL_PollEvent(event)){
+        if(event->type == SDL_QUIT || event->type == SDL_WINDOWEVENT_CLOSE){
+            done = true;
+        }
+        /*
         else if (event->type == SDL_KEYDOWN){
             if(event->key.keysym.scancode == SDL_SCANCODE_UP && player.colBot){
                 player.velocity.y = 2.0f;
             }
+         
         }
+         */
     }
 }
 
-void renderGame(ShaderProgram* program, Entity* player, Entity* enemy) {
-    player->Render(program, player);
-    enemy->Render(program, player);
+
+void updateGame(float elapsed) {
+    if (keys[SDL_SCANCODE_RIGHT] && !(player.colRight)){
+        player.velocity.x = 3.0f;
+    }
+    else if (keys[SDL_SCANCODE_LEFT] && !(player.colLeft)){
+        player.velocity.x = -3.0f;
+    }
+    
+    player.colRight = false;
+    player.colTop = false;
+    player.colLeft = false;
+    player.colBot = false;
 }
 
-void updateGame(float elapsed, Entity* player, Entity* enemy) {
-    player->colRight = false;
-    player->colLeft = false;
-    player->colTop = false;
-    player->colBot = false;
+Matrix projectionMatrix, modelMatrix, viewMatrix;
+
+void renderLevel(ShaderProgram* program) {
+    modelMatrix.Identity();
+    program->SetModelMatrix(modelMatrix);
+    program->SetProjectionMatrix(projectionMatrix);
+    program->SetViewMatrix(viewMatrix);
     
-    player->updateY(elapsed);
-    player->CollisionY(enemy);
+    glBindTexture(GL_TEXTURE_2D, tiles);
+    std::vector<float> vertexData;
+    std::vector<float> texCoorData;
+    for (int y = 0; y < map.mapHeight; y++) {
+        for (int x = 0; x < map.mapWidth; x++) {
+            if (map.mapData[y][x] != 0) {
+                float u = (float)((((int)map.mapData[y][x])) % spriteCountX) / (float)spriteCountX;
+                float v = (float)(((int)map.mapData[y][x]) / spriteCountX) / (float)spriteCountY;
+                float spriteWidth = 1.0f / (float)spriteCountX;
+                float spriteHeight = 1.0f / (float)spriteCountY;
+                vertexData.insert(vertexData.end(), {
+                    TILE_SIZE * x, -TILE_SIZE * y,
+                    TILE_SIZE * x, (-TILE_SIZE * y) - TILE_SIZE,
+                    (TILE_SIZE * x) + TILE_SIZE, (-TILE_SIZE * y) - TILE_SIZE,
+                    TILE_SIZE * x, -TILE_SIZE * y,
+                    (TILE_SIZE * x) + TILE_SIZE, (-TILE_SIZE * y) - TILE_SIZE,
+                    (TILE_SIZE * x) + TILE_SIZE, -TILE_SIZE * y
+                });
+                texCoorData.insert(texCoorData.end(), {
+                    u, v,
+                    u, v + (spriteHeight),
+                    u + spriteWidth, v + (spriteHeight),
+                    u, v,
+                    u + spriteWidth, v + (spriteHeight),
+                    u + spriteWidth, v
+                });
+            }
+        }
+    }
+    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertexData.data());
+    glEnableVertexAttribArray(program->positionAttribute);
+    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoorData.data());
+    glEnableVertexAttribArray(program->texCoordAttribute);
     
-    player->updateX(elapsed);
-    player->CollisionX(enemy);
+    glBindTexture(GL_TEXTURE_2D, tiles);
+    glDrawArrays(GL_TRIANGLES, 0, vertexData.size()/2);
+    glDisableVertexAttribArray(program->positionAttribute);
+    glDisableVertexAttribArray(program->texCoordAttribute);
 }
 
 
 
-int main(int argc, char *argv[])
-{
-        ShaderProgram program;
-        setup(&program);
-        
-        GLuint fontTexture = LoadTexture(RESOURCE_FOLDER"font1.png");
-        GLuint spriteSheetTexture = LoadTexture(RESOURCE_FOLDER"sheet.png");
+
+int main(int argc, char *argv[]) {
+
+    ShaderProgram program;
+    float lastFrameTicks = 0.0f;
+    float accumulator = 0.0f;
+    setup(&program);
+    float lfticks;
+    bool done = false;
+    SDL_Event event;
+    
+    tiles = LoadTexture("arne_sprites.png");
+    projectionMatrix.SetOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
+    glUseProgram(program.programID);
+    
+    map.Load("TileMap.txt");
+    SheetSprite playerSprite;
+    SheetSprite enemySprite;
+    
+    playerSprite = SheetSprite(tiles, 79, TILE_SIZE);
+    player = Entity(13.0f, -14.0f, 0.5f, 0.5f, playerSprite, ENTITY_PLAYER, false);
+    enemySprite = SheetSprite(tiles, 445, TILE_SIZE);
+    enemy = Entity(28.0f, -8.0f, 0.5f, 0.5f, enemySprite, ENTITY_ENEMY, false);
+    while (!done) {
+        float ticks = (float)SDL_GetTicks() /1000.f;
+        float elapsed = ticks - lfticks;
+        lfticks = ticks;
+        ProcessGameInput(&event, done);
+        updateGame(elapsed);
+        glClear(GL_COLOR_BUFFER_BIT);
+        modelMatrix.Identity();
+        program.SetModelMatrix(modelMatrix);
+        program.SetViewMatrix(viewMatrix);
+        
+        renderLevel(&program);
+        viewMatrix.Identity();
+        player.Draw(program);
+        viewMatrix.Identity();
+        enemy.Draw(program);
+        viewMatrix.Translate(-player.position.x * 0.5f, -player.position.y * 0.5f, 0.0f);
+        program.SetViewMatrix(viewMatrix);
+        
+        SDL_GL_SwapWindow(displayWindow);
+    }
     
     
-        SheetSprite EnemySprite = SheetSprite(spriteSheetTexture, 425.0f/1024.0f, 468.0f/1024.0f, 93.0f/1024.0f, 84.0f/1024.0f, 0.2);
-        SheetSprite playerSprite = SheetSprite(spriteSheetTexture, 247.0f/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
-        SheetSprite BulletSprite = SheetSprite(spriteSheetTexture, 842.0f/1024.0f, 230.0f/1024.0f, 9.0f/1024.0f, 54.0f/1024.0f, 0.2);
-    SheetSprite titleSprite = SheetSprite(spriteSheetTexture, 247.0/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
-    SheetSprite EnemySprite2 = SheetSprite(spriteSheetTexture, 230.0f/1024.0f, 530.0f/1024.0f, 100.0f/1024.0f, 140.0f/1024.0f, 0.2);
-        
-        float lastFrameTicks = 0.0f;
-        
-        
-        SDL_Event event;
-        bool done = false;
-        
-        GameMode mode = STATE_MAIN_MENU;
-        Entity font(-1.08f, 0.0f, 0.3f, 0.3f);
-        Entity player(01.0f, -1.3f, 1.5f, 1.5f);
-    Entity font2(-1.08f, 0.0f, 0.4f, 0.5f);
-        Entity font3(-1.08f, 0.0f, 0.5f, 0.3f);
-    Entity titleim(-1.0f, -1.3f, 1.5f, 1.5f);
-        Entity titleim2(1.0f, -1.3f, 1.5f, 1.5f);
-        
-        std::vector<Entity> aliens;
-        
-        float initialX = -3.55f-0.5*0.2*1.5f;
-        float initialY = 1.8f;
-        
-        for(GLsizei j=0; j<5; j++){
-                for(GLsizei i=0; i<11; i++){
-                        Entity newEnemy(initialX, initialY, 1.5f, 1.5f);
-                        initialX+=0.5*1.3f;
-                        aliens.push_back(newEnemy);
-                    }
-                initialX = -3.55f-0.5*0.2*1.5f;
-                initialY-=0.4f;
-            }
-        
-        
-        std::vector<Entity> bullets;
-        for(GLsizei i=0; i<MAX_BULLETS; i++){
-                Entity newBullet(-2000.0f, 0.0f, 1.5f, 1.5f);
-                bullets.push_back(newBullet);
-            }
-        
-        while (!done) {
-                float ticks = (float)SDL_GetTicks()/1000.0f;
-                float elapsed = ticks - lastFrameTicks;
-                lastFrameTicks = ticks;
-                
-                if(mode == STATE_MAIN_MENU){
-                        ProcessMainMenuInput(&event, done, mode);
-                    }else if(mode == STATE_GAME_LEVEL){
-                            ProcessGameInput(&event, done, bullets, player);
-                        }else if(mode == STATE_GAME_OVER){
-                                ProcessGameOverInput(&event, done, mode);
-                            }else if(mode == STATE_WIN){
-                                    ProcessGameOverInput(&event, done, mode);
-                                }
-                
-                glClear(GL_COLOR_BUFFER_BIT);
-                
-                
-                if(mode == STATE_MAIN_MENU){
-                        RenderMainMenu(&program, font, font2, font3, fontTexture, titleSprite, titleim, titleim2);
-                    }else if(mode == STATE_GAME_LEVEL){
-                            UpdateGame(aliens, player, bullets, elapsed, mode);
-                            RenderGame(&program, aliens, playerSprite, EnemySprite, player, bullets, BulletSprite, EnemySprite2);
-                        }else if(mode == STATE_GAME_OVER){
-                                RenderGameOver(&program, font, font2, fontTexture);
-                            }else if(mode == STATE_WIN){
-                                    RenderWin(&program, font, font2, fontTexture);
-                                }
-                
-                
-                SDL_GL_SwapWindow(displayWindow);
-                
-            }
-        
-        SDL_Quit();
-        return 0;
+    SDL_Quit();
+    return 0;
 }
 
