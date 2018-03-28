@@ -1,10 +1,3 @@
-//
-//  FlareMap.cpp
-//  NYUCodebase
-//
-//  Created by Stanley Zeng on 3/27/18.
-//  Copyright © 2018 Ivan Safrin. All rights reserved.
-//
 
 #include "FlareMap.hpp"
 #include <fstream>
@@ -12,6 +5,9 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#define spriteCountX 16
+#define spriteCountY 8
+#define TILE_SIZE 0.5f
 
 FlareMap::FlareMap() {
     mapData = nullptr;
@@ -19,26 +15,58 @@ FlareMap::FlareMap() {
     mapHeight = -1;
 }
 
-bool FlareMap::readLayerData(std::ifstream &stream) {
+FlareMap::~FlareMap() {
+    for(int i=0; i < mapHeight; i++) {
+        delete mapData[i];
+    }
+    delete mapData;
+}
+
+bool FlareMap::ReadHeader(std::ifstream &stream) {
     std::string line;
-    while(getline(stream, line)) {
-        if (line == "") {break;}
+    mapWidth = -1;
+    mapHeight = -1;
+    while(std::getline(stream, line)) {
+        if(line == "") { break; }
         std::istringstream sStream(line);
         std::string key,value;
-        getline(sStream, key, '=');
-        getline(sStream, value);
-        if (key == "data"){
-            for (int y = 0; y < mapHeight; y++) {
+        std::getline(sStream, key, '=');
+        std::getline(sStream, value);
+        if(key == "width") {
+            mapWidth = std::atoi(value.c_str());
+        } else if(key == "height"){
+            mapHeight = std::atoi(value.c_str());
+        }
+    }
+    if(mapWidth == -1 || mapHeight == -1) {
+        return false;
+    } else {
+        mapData = new unsigned int*[mapHeight];
+        for(int i = 0; i < mapHeight; ++i) {
+            mapData[i] = new unsigned int[mapWidth];
+        }
+        return true;
+    }
+}
+
+bool FlareMap::ReadLayerData(std::ifstream &stream) {
+    std::string line;
+    while(getline(stream, line)) {
+        if(line == "") { break; }
+        std::istringstream sStream(line);
+        std::string key,value;
+        std::getline(sStream, key, '=');
+        std::getline(sStream, value);
+        if(key == "data") {
+            for(int y=0; y < mapHeight; y++) {
                 getline(stream, line);
                 std::istringstream lineStream(line);
                 std::string tile;
-                
-                for (int x = 0; x < mapWidth; x++ ){
-                    getline(lineStream, tile, ',');
-                    unsigned char val = (unsigned char)atoi(tile.c_str());
-                    if (val > 0) {
-                        //be careful, the tiles in this format are indexed from 1 not 0
-                        mapData[y][x] = val -1;
+                for(int x=0; x < mapWidth; x++) {
+                    std::getline(lineStream, tile, ',');
+                    unsigned int val = atoi(tile.c_str());
+                    if(val > 0) {
+                        mapData[y][x] = val-1;
                     } else {
                         mapData[y][x] = 0;
                     }
@@ -49,28 +77,26 @@ bool FlareMap::readLayerData(std::ifstream &stream) {
     return true;
 }
 
-bool FlareMap::readEntityData(std::ifstream &stream) {
+
+bool FlareMap::ReadEntityData(std::ifstream &stream) {
     std::string line;
     std::string type;
     while(getline(stream, line)) {
-        if (line == "") { break; }
-        
+        if(line == "") { break; }
         std::istringstream sStream(line);
-        std::string key, value;
+        std::string key,value;
         getline(sStream, key, '=');
         getline(sStream, value);
-        
-        if (key == "type") {
+        if(key == "type") {
             type = value;
         } else if(key == "location") {
-            
             std::istringstream lineStream(value);
             std::string xPosition, yPosition;
             getline(lineStream, xPosition, ',');
             getline(lineStream, yPosition, ',');
             
             FlareMapEntity newEntity;
-            newEntity.type= type;
+            newEntity.type = type;
             newEntity.x = std::atoi(xPosition.c_str());
             newEntity.y = std::atoi(yPosition.c_str());
             entities.push_back(newEntity);
@@ -79,53 +105,59 @@ bool FlareMap::readEntityData(std::ifstream &stream) {
     return true;
 }
 
-bool FlareMap::readHeaderData(std::ifstream &stream){
-    std::string line;
-    mapWidth = -1;
-    mapHeight = -1;
-    while ( getline(stream, line)) {
-        if (line == "") {break;}
-        
-        std::istringstream sStream(line);
-        std::string key, value;
-        getline(sStream, key, '=');
-        getline(sStream, value);
-        
-        if (key == "width") {
-            mapWidth = atoi(value.c_str());
-        } else if (key == "height") {
-            mapHeight = atoi(value.c_str());
-        }
+void FlareMap::Load(const std::string fileName) {
+    std::ifstream infile(fileName);
+    if(infile.fail()) {
+        assert(false); // unable to open file
     }
-    
-    if (mapWidth == -1 || mapHeight == -1) {
-        return false;
-    } else {
-        mapData = new unsigned int*[mapHeight];
-        for (int i = 0; i < mapHeight; i++) {
-            mapData[i] = new unsigned int[mapWidth];
+    std::string line;
+    while (std::getline(infile, line)) {
+        if(line == "[header]") {
+            if(!ReadHeader(infile)) {
+                assert(false); // invalid file data
+            }
+        } else if(line == "[layer]") {
+            ReadLayerData(infile);
+        } else if(line == "[ObjectsLayer]") {
+            ReadEntityData(infile);
         }
-        return true;
     }
 }
 
-void FlareMap::Load(const std::string fileName) {
-    std::ifstream ifs(fileName);
-    if (ifs.fail()) {
-        assert(false);
-    }
-    std::string str;
-    while(getline(ifs, str)) {
-        if (str == "[header]") {
-            if (!readHeaderData(ifs)) {
-                assert(false);
+
+void FlareMap::drawMap() {
+    std::vector<float> vertexData;
+    std::vector<float> texCoordData;
+    
+    for (int y = 0; y < mapHeight; y++) {
+        for (int x = 0; x < mapWidth; x++) {
+            
+            if (mapData[y][x] != 0) {
+                float u = (float)(((int)mapData[y][x]) % spriteCountX) / (float)spriteCountX;
+                float v = (float)(((int)mapData[y][x]) / spriteCountX) / (float)spriteCountY;
+                
+                float spriteWidth = 1.0f / (float)spriteCountX;
+                float spriteHeight = 1.0f / (float)spriteCountY;
+                
+                vertexData.insert(vertexData.end(), {
+                    TILE_SIZE * x, -TILE_SIZE * y,
+                    TILE_SIZE * x, (-TILE_SIZE * y) - TILE_SIZE,
+                    (TILE_SIZE * x) + TILE_SIZE, (-TILE_SIZE * y) - TILE_SIZE,
+                    TILE_SIZE * x, -TILE_SIZE * y,
+                    (TILE_SIZE * x) + TILE_SIZE, (-TILE_SIZE * y) - TILE_SIZE,
+                    (TILE_SIZE * x) + TILE_SIZE, -TILE_SIZE * y
+                });
+                
+                texCoordData.insert(texCoordData.end(), {
+                    u, v,
+                    u, v + (spriteHeight),
+                    u + spriteWidth, v + (spriteHeight),
+                    u, v,
+                    u + spriteWidth, v + (spriteHeight),
+                    u + spriteWidth, v
+                });
+                
             }
-        }
-        else if (str == "[layer]") {
-            readLayerData(ifs);
-        }
-        else if (str == "[ObjectsLayer]") {
-            readEntityData(ifs);
         }
     }
 }
