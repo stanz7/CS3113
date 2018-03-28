@@ -45,7 +45,7 @@ GLuint LoadTexture(const char* filepath){
     int w,h,comp;
     unsigned char* image = stbi_load(filepath, &w, &h, &comp, STBI_rgb_alpha);
     if(image == NULL){
-        std::cout << "Unable to load image. Make sure the path is corret\n";
+        std::cout << "Unable to load image. Make sure the path is correct\n";
         assert(false);
         
     }
@@ -61,49 +61,53 @@ GLuint LoadTexture(const char* filepath){
 
 class SheetSprite{
 public:
+    SheetSprite(){};
+    SheetSprite(unsigned int textureID, float u, float v, float width, float height, float
+                size):textureID(textureID), u(u), v(v), width(width), height(height), size(size){ }
+    
+    void Draw(ShaderProgram *program) const {
+        
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        
+        GLfloat texCoords[] = {
+            u, v+height,
+            u+width, v,
+            u, v,
+            u+width, v,
+            u, v+height,
+            u+width, v+height
+        };
+        
+        float vertices[] = {
+            -0.5f , -0.5f,
+            0.5f, 0.5f ,
+            -0.5f , 0.5f ,
+            0.5f, 0.5f ,
+            -0.5f, -0.5f  ,
+            0.5f , -0.5f };
+        
+        glUseProgram(program->programID);
+        
+        glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+        glEnableVertexAttribArray(program->positionAttribute);
+        glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+        glEnableVertexAttribArray(program->texCoordAttribute);
+        
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+        glDisableVertexAttribArray(program->positionAttribute);
+        glDisableVertexAttribArray(program->texCoordAttribute);
+    }
+    
+    
+    
     unsigned int textureID;
     float u;
     float v;
     float width;
     float height;
     float size;
-    int id;
-    
-    SheetSprite();
-    SheetSprite(unsigned int textureID, int id, float size) : textureID(textureID), id(id), size(size) {
-        u = (float)(id % 30) / (float)30;
-        v = (float)(id / 30) / (float)30;
-        width = 1.0f / 30.0f;
-        height = 1.0f / 30.0f;
-    }
-    void Draw(ShaderProgram *program, float x, float y) {
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        float vertices[] = {
-            size * x, size * y,
-            size * x, (size * y) - size,
-            (size * x) + size, (size * y) - size,
-            size * x, size * y,
-            (size * x) + size, (size * y) - size,
-            (size * x) + size, size * y
-        };
-        GLfloat texCoords[] = {
-            u, v,
-            u, v + (height),
-            u + width, v + (height),
-            u, v,
-            u + width, v + (height),
-            u + width, v
-        };
-        glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-        glEnableVertexAttribArray(program->positionAttribute);
-        glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-        glEnableVertexAttribArray(program->texCoordAttribute);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDisableVertexAttribArray(program->positionAttribute);
-        glDisableVertexAttribArray(program->texCoordAttribute);
-    }
 };
-
 
 void DrawText(ShaderProgram *program, GLuint fontTexture, std::string text, float size, float spacing) {
     
@@ -246,7 +250,7 @@ public:
             program.SetModelMatrix(modelMatrix);
             program.SetViewMatrix(viewMatrix);
         }
-        sprite.Draw(&program, position.x, position.y);
+        sprite.Draw(&program);
     }
     
     bool CollisionX(Entity* entity) {
@@ -334,28 +338,7 @@ public:
             }
         }
     }
-    /*
-    void Render(ShaderProgram* program, Entity* player){
-        
-        Matrix projectionMatrix;
-        projectionMatrix.SetOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
-        Matrix modelMatrix;
-        modelMatrix.Translate(position.x, position.y, position.z);
-        modelMatrix.Scale(size.x, size.y, size.z);
-        
-        Matrix viewMatrix;
-        
-        viewMatrix.Translate(-1.0f*player->position.x, -1.0f*player->position.y, 0.0f);
-        
-        glUseProgram(program->programID);
-        
-        program->SetProjectionMatrix(projectionMatrix);
-        program->SetModelMatrix(modelMatrix);
-        program->SetViewMatrix(viewMatrix);
-        
-        sprites.Draw(program);
-    }
-     */
+
 };
 
 Entity player;
@@ -381,7 +364,7 @@ void setup(ShaderProgram* program){
     program->Load(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0.455f, 0.0f, 0.416f, 1.0f);
+    glClearColor(0.3f, 0.0f, 0.0f, 1.0f);
 
 }
     
@@ -473,26 +456,28 @@ int main(int argc, char *argv[]) {
     float lastFrameTicks = 0.0f;
     float accumulator = 0.0f;
     setup(&program);
-    float lfticks;
     bool done = false;
     SDL_Event event;
     
-    tiles = LoadTexture("arne_sprites.png");
+    tiles = LoadTexture(RESOURCE_FOLDER"arne_sprites.png");
+    //GLuint playsprite = LoadTexture(RESOURCE_FOLDER"characters_1.png");
+    
     projectionMatrix.SetOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
     glUseProgram(program.programID);
     
-    map.Load("TileMap.txt");
+    map.Load(RESOURCE_FOLDER"TileMap.txt");
     SheetSprite playerSprite;
     SheetSprite enemySprite;
     
-    playerSprite = SheetSprite(tiles, 79, TILE_SIZE);
+    playerSprite = SheetSprite(tiles, 247.0f/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, TILE_SIZE);
+    enemySprite = SheetSprite(tiles, 288.0f/1024.0f, 432.0f/1024.0f, 70.0f/1024.0f, 70.0f/1024.0f, TILE_SIZE);
+    
     player = Entity(13.0f, -14.0f, 0.5f, 0.5f, playerSprite, ENTITY_PLAYER, false);
-    enemySprite = SheetSprite(tiles, 445, TILE_SIZE);
     enemy = Entity(28.0f, -8.0f, 0.5f, 0.5f, enemySprite, ENTITY_ENEMY, false);
     while (!done) {
         float ticks = (float)SDL_GetTicks() /1000.f;
-        float elapsed = ticks - lfticks;
-        lfticks = ticks;
+        float elapsed = ticks - lastFrameTicks;
+        lastFrameTicks = ticks;
         ProcessGameInput(&event, done);
         updateGame(elapsed);
         glClear(GL_COLOR_BUFFER_BIT);

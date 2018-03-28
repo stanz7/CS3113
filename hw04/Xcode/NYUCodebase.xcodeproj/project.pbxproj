@@ -12,6 +12,7 @@
 		3D4721A7206B16AC00849CCE /* FlareMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4721A5206B16AC00849CCE /* FlareMap.cpp */; };
 		3D4721A9206B1BC500849CCE /* TileMap.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721A8206B1BC500849CCE /* TileMap.txt */; };
 		3D4721AB206B1BEA00849CCE /* arne_sprites.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721AA206B1BEA00849CCE /* arne_sprites.png */; };
+		3D4721B0206B38E700849CCE /* characters_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721AF206B38E600849CCE /* characters_1.png */; };
 		6D5A86AE19AE5C710066C1FD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5A86AD19AE5C710066C1FD /* Cocoa.framework */; };
 		6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D5A86B619AE5C710066C1FD /* InfoPlist.strings */; };
 		6D5A86BA19AE5C710066C1FD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D5A86B919AE5C710066C1FD /* main.cpp */; };
@@ -36,6 +37,7 @@
 		3D4721A6206B16AC00849CCE /* FlareMap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FlareMap.hpp; sourceTree = "<group>"; };
 		3D4721A8206B1BC500849CCE /* TileMap.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TileMap.txt; sourceTree = "<group>"; };
 		3D4721AA206B1BEA00849CCE /* arne_sprites.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arne_sprites.png; sourceTree = "<group>"; };
+		3D4721AF206B38E600849CCE /* characters_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = characters_1.png; path = ../../../../characters_1.png; sourceTree = "<group>"; };
 		6D5A86AA19AE5C710066C1FD /* NYUCodebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NYUCodebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D5A86AD19AE5C710066C1FD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6D5A86B019AE5C710066C1FD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -156,6 +158,7 @@
 		6D5A86E119AE5CAA0066C1FD /* Code */ = {
 			isa = PBXGroup;
 			children = (
+				3D4721AF206B38E600849CCE /* characters_1.png */,
 				3D4721AA206B1BEA00849CCE /* arne_sprites.png */,
 				3D4721A8206B1BC500849CCE /* TileMap.txt */,
 				3D330679204FA337001B9381 /* font1.png */,
@@ -232,6 +235,7 @@
 				3D4721A9206B1BC500849CCE /* TileMap.txt in Resources */,
 				6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */,
 				6DEF23C11B96CC2600BCE792 /* fragment.glsl in Resources */,
+				3D4721B0206B38E700849CCE /* characters_1.png in Resources */,
 				6DE9D2F11BA6AB8C002D599C /* fragment_textured.glsl in Resources */,
 				3D33067C204FA337001B9381 /* font1.png in Resources */,
 				6D5A86C619AE5C710066C1FD /* Images.xcassets in Resources */,
