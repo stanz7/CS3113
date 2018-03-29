@@ -10,10 +10,10 @@
 		3D33067B204FA337001B9381 /* sheet.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330678204FA337001B9381 /* sheet.png */; };
 		3D4721A7206B16AC00849CCE /* FlareMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4721A5206B16AC00849CCE /* FlareMap.cpp */; };
 		3D4721A9206B1BC500849CCE /* TileMap.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721A8206B1BC500849CCE /* TileMap.txt */; };
-		3D4721B4206B44D000849CCE /* characters_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721B3206B44D000849CCE /* characters_1.png */; };
 		3D4721B8206B456C00849CCE /* arne_sprites.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721B7206B456C00849CCE /* arne_sprites.png */; };
 		3D4721D5206C4FEB00849CCE /* aliens.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721D4206C4FEB00849CCE /* aliens.png */; };
-		3D4721D7206C501400849CCE /* spritesheet_wood.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721D6206C501400849CCE /* spritesheet_wood.png */; };
+		3D4721D7206C501400849CCE /* blocks.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721D6206C501400849CCE /* blocks.png */; };
+		3D4721DE206C8D3700849CCE /* items.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721DD206C8D3700849CCE /* items.png */; };
 		6D5A86AE19AE5C710066C1FD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5A86AD19AE5C710066C1FD /* Cocoa.framework */; };
 		6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D5A86B619AE5C710066C1FD /* InfoPlist.strings */; };
 		6D5A86BA19AE5C710066C1FD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D5A86B919AE5C710066C1FD /* main.cpp */; };
@@ -36,10 +36,10 @@
 		3D4721A5206B16AC00849CCE /* FlareMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FlareMap.cpp; sourceTree = "<group>"; };
 		3D4721A6206B16AC00849CCE /* FlareMap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FlareMap.hpp; sourceTree = "<group>"; };
 		3D4721A8206B1BC500849CCE /* TileMap.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TileMap.txt; sourceTree = "<group>"; };
-		3D4721B3206B44D000849CCE /* characters_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = characters_1.png; sourceTree = "<group>"; };
 		3D4721B7206B456C00849CCE /* arne_sprites.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arne_sprites.png; sourceTree = "<group>"; };
 		3D4721D4206C4FEB00849CCE /* aliens.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = aliens.png; sourceTree = "<group>"; };
-		3D4721D6206C501400849CCE /* spritesheet_wood.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spritesheet_wood.png; sourceTree = "<group>"; };
+		3D4721D6206C501400849CCE /* blocks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blocks.png; sourceTree = "<group>"; };
+		3D4721DD206C8D3700849CCE /* items.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = items.png; path = ../../../../items.png; sourceTree = "<group>"; };
 		6D5A86AA19AE5C710066C1FD /* NYUCodebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NYUCodebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D5A86AD19AE5C710066C1FD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6D5A86B019AE5C710066C1FD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -166,6 +166,7 @@
 				6DEF23BB1B96CC2600BCE792 /* fragment.glsl */,
 				6DE9D2F01BA6AB8C002D599C /* fragment_textured.glsl */,
 				6DC707691BA7273500225B7D /* vertex_textured.glsl */,
+				3D4721DD206C8D3700849CCE /* items.png */,
 				6DEF23BC1B96CC2600BCE792 /* Matrix.cpp */,
 				6DEF23BD1B96CC2600BCE792 /* Matrix.h */,
 				6DEF23BE1B96CC2600BCE792 /* ShaderProgram.cpp */,
@@ -175,8 +176,7 @@
 				3D4721A5206B16AC00849CCE /* FlareMap.cpp */,
 				3D4721D4206C4FEB00849CCE /* aliens.png */,
 				3D4721A6206B16AC00849CCE /* FlareMap.hpp */,
-				3D4721D6206C501400849CCE /* spritesheet_wood.png */,
-				3D4721B3206B44D000849CCE /* characters_1.png */,
+				3D4721D6206C501400849CCE /* blocks.png */,
 				3D4721B7206B456C00849CCE /* arne_sprites.png */,
 			);
 			name = Code;
@@ -239,15 +239,15 @@
 				6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */,
 				3D4721B8206B456C00849CCE /* arne_sprites.png in Resources */,
 				6DEF23C11B96CC2600BCE792 /* fragment.glsl in Resources */,
+				3D4721DE206C8D3700849CCE /* items.png in Resources */,
 				6DE9D2F11BA6AB8C002D599C /* fragment_textured.glsl in Resources */,
-				3D4721B4206B44D000849CCE /* characters_1.png in Resources */,
 				6D5A86C619AE5C710066C1FD /* Images.xcassets in Resources */,
 				3D4721D5206C4FEB00849CCE /* aliens.png in Resources */,
 				6D5A86BE19AE5C710066C1FD /* Credits.rtf in Resources */,
 				3D33067B204FA337001B9381 /* sheet.png in Resources */,
 				6DEF23C41B96CC2600BCE792 /* vertex.glsl in Resources */,
 				6DC7076A1BA7273500225B7D /* vertex_textured.glsl in Resources */,
-				3D4721D7206C501400849CCE /* spritesheet_wood.png in Resources */,
+				3D4721D7206C501400849CCE /* blocks.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

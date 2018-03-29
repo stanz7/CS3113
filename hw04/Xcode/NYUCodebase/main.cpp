@@ -6,6 +6,9 @@
 #include <SDL_image.h>
 
 #include <vector>
+#include <iostream>
+#include <string>
+#include <fstream>
 #include "Matrix.h"
 #include "ShaderProgram.h"
 #include "FlareMap.hpp"
@@ -182,22 +185,28 @@ public:
     Vector3 size;
     Vector3 velocity;
     Vector3 acceleration;
-    
-    //    bool isStatic;
-    
     EntityType entityType;
     
-    bool collideTop;
-    bool collideBottom;
-    bool collideLeft;
-    bool collideRight;
+    bool colTop;
+    bool colBottom;
+    bool colLeft;
+    bool colRight;
     int spriteint;
     float x;
     float y;
     float width;
     float height;
     
-    Entity(const SheetSprite& sprite, float positionX, float positionY, float sizeX, float sizeY, float velocityX, float velocityY, float accelerationX, float accelerationY, EntityType entityType):sprite(sprite), position(positionX, positionY, 0.0f), size(sizeX*sprite.size*sprite.width/sprite.height, sizeY*sprite.size, 0.0f), velocity(velocityX, velocityY, 0.0f), acceleration(accelerationX, accelerationY, 0.0f), entityType(entityType){
+    Entity() {
+        entityType = ENTITY_ENEMY;
+        spriteint = 0;
+        x = 0;
+        y = 0;
+        width = 0;
+        height = 0;
+    };
+    
+    Entity(const SheetSprite& sprite, float posx, float posy, float sizeX, float sizeY, float velocityX, float velocityY, float accX, float accY, EntityType entityType):sprite(sprite), position(posx, posy, 0.0f), size(sizeX * sprite.size * sprite.width/sprite.height, sizeY * sprite.size, 0.0f), velocity(velocityX, velocityY, 0.0f), acceleration(accX, accY, 0.0f), entityType(entityType){
     };
     
     Entity(float x, float y, float width, float height, int sprite, EntityType entityType)
@@ -240,7 +249,7 @@ public:
             
             if(position.y <= -2.0f+size.y*0.5){
                 position.y = -2.0f+size.y*0.5;
-                collideBottom = true;
+                colBottom = true;
             }
             
         }
@@ -267,7 +276,7 @@ public:
         sprite.Draw(program);
     }
     
-    bool CollidesWithX(Entity* entity){
+    bool colsWithX(Entity* entity){
         
         if(position.x+size.x*0.5 < entity->position.x-entity->size.x*0.5 || position.x-size.x*0.5 > entity->position.x+entity->size.x*0.5|| position.y+size.y*0.5 < entity->position.y-entity->size.y*0.5 || position.y-size.y*0.5 > entity->position.y+entity->size.y*0.5){
             return false;
@@ -275,16 +284,16 @@ public:
             if(entity->entityType == ENTITY_COIN){
                 entity->position.x = -2000.0f;
             }else if(entity->entityType == ENTITY_STATIC){
-                double Xpenetration = 0.0f;
+                double Xpen = 0.0f;
                 
-                Xpenetration = fabs(fabs(position.x-entity->position.x) - size.x*0.5 - entity->size.x*0.5);
+                Xpen = fabs(fabs(position.x-entity->position.x) - size.x*0.5 - entity->size.x*0.5);
                 
                 if(position.x>entity->position.x){
-                    position.x = position.x + Xpenetration + 0.00001f;
-                    collideLeft = true;
+                    position.x = position.x + Xpen + 0.00001f;
+                    colLeft = true;
                 }else{
-                    position.x = position.x - Xpenetration - 0.000001f;
-                    collideRight = true;
+                    position.x = position.x - Xpen - 0.000001f;
+                    colRight = true;
                 }
                 
                 velocity.x = 0.0f;
@@ -293,7 +302,7 @@ public:
         }
     }
     
-    bool CollidesWithY(Entity* entity){
+    bool colsWithY(Entity* entity){
         
         if(position.x+size.x*0.5 < entity->position.x-entity->size.x*0.5 || position.x-size.x*0.5 > entity->position.x+entity->size.x*0.5|| position.y+size.y*0.5 < entity->position.y-entity->size.y*0.5 || position.y-size.y*0.5 > entity->position.y+entity->size.y*0.5){
             return false;
@@ -301,17 +310,17 @@ public:
             if(entity->entityType == ENTITY_COIN){
                 entity->position.x = -2000.0f;
             }else if(entity->entityType == ENTITY_STATIC){
-                double Ypenetration = 0.0f;
+                double Ypen = 0.0f;
                 
                 
-                Ypenetration = fabs(fabs(position.y-entity->position.y) - size.y*0.5 - entity->size.y*0.5);
+                Ypen = fabs(fabs(position.y-entity->position.y) - size.y*0.5 - entity->size.y*0.5);
                 
                 if(position.y>entity->position.y){
-                    position.y = position.y + Ypenetration + 0.00001f;
-                    collideBottom = true;
+                    position.y = position.y + Ypen + 0.00001f;
+                    colBottom = true;
                 }else{
-                    position.y = position.y - Ypenetration - 0.00001f;
-                    collideTop = true;
+                    position.y = position.y - Ypen - 0.00001f;
+                    colTop = true;
                 }
                 
                 velocity.y = 0.0f;
@@ -329,55 +338,10 @@ void worldToTileCoordinates(float worldX, float worldY, int * gridX, int *gridY)
     *gridY = (int)(-worldY / TILE_SIZE);
 }
 
-/*
- void parseMap(string levelFile) {
- map.Load(levelFile);
- for (int i = 0; i < map.entities.size(); i++) {
- PlaceEntity(map.entities[i].type, map.entities[i].x * TILE_SIZE, map.entities[i].y * -TILE_SIZE);
- }
- 
- }
- vector<float> vertexData;
- vector<float> texCoordData;
- void drawMap() {
- parseMap("TileMap.txt");
- 
- for (int y = 0; y < map.mapHeight; y++) {
- for (int x = 0; x < map.mapWidth; x++) {
- if (map.mapData[y][x] != 0) {
- float u = (float)(((int)map.mapData[y][x]) % spriteCountX) / (float)spriteCountX;
- float v = (float)(((int)map.mapData[y][x]) / spriteCountX) / (float)spriteCountY;
- 
- float spriteWidth = 1.0f / (float)spriteCountX;
- float spriteHeight = 1.0f / (float)spriteCountY;
- 
- vertexData.insert(vertexData.end(), {
- TILE_SIZE * x, -TILE_SIZE * y,
- TILE_SIZE * x, (-TILE_SIZE * y) - TILE_SIZE,
- (TILE_SIZE * x) + TILE_SIZE, (-TILE_SIZE * y) - TILE_SIZE,
- TILE_SIZE * x, -TILE_SIZE * y,
- (TILE_SIZE * x) + TILE_SIZE, (-TILE_SIZE * y) - TILE_SIZE,
- (TILE_SIZE * x) + TILE_SIZE, -TILE_SIZE * y
- });
- 
- texCoordData.insert(texCoordData.end(), {
- u, v,
- u, v + (spriteHeight),
- u + spriteWidth, v + (spriteHeight),
- u, v,
- u + spriteWidth, v + (spriteHeight),
- u + spriteWidth, v
- });
- 
- }
- }
- }
- 
- }
- */
+
 void setup(ShaderProgram* program){
     SDL_Init(SDL_INIT_VIDEO);
-    displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+    displayWindow = SDL_CreateWindow("Platform Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
     SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
@@ -398,98 +362,100 @@ void processGameInput(SDL_Event* event, bool& done, Entity* player){
         if (event->type == SDL_QUIT || event->type == SDL_WINDOWEVENT_CLOSE) {
             done = true;
         }else if(event->type == SDL_KEYDOWN){
-            if(event->key.keysym.scancode == SDL_SCANCODE_SPACE && player->collideBottom == true){
+            if(event->key.keysym.scancode == SDL_SCANCODE_UP && player->colBottom == true){
                 player->velocity.y = 2.0f;
             }
         }
     }
 }
 
-void updateGame(float elapsed, Entity* player, std::vector<Entity*> woods, Entity* coin ){
-    player->collideBottom = false;
-    player->collideTop = false;
-    player->collideRight = false;
-    player->collideLeft = false;
+void updateGame(float elapsed, Entity* player, std::vector<Entity*> blocks, Entity* coin ){
+    player->colBottom = false;
+    player->colTop = false;
+    player->colRight = false;
+    player->colLeft = false;
     
     player->UpdateY(elapsed);
-    for (Entity* woodPtr : woods){
-        player->CollidesWithY(woodPtr);
+    for (Entity* blockptr : blocks){
+        player->colsWithY(blockptr);
     }
-    player->CollidesWithY(coin);
+    player->colsWithY(coin);
     
     
     player->UpdateX(elapsed);
-    for (Entity* woodPtr : woods){
-        player->CollidesWithX(woodPtr);
+    for (Entity* woodPtr : blocks){
+        player->colsWithX(woodPtr);
     }
-    player->CollidesWithX(coin);
+    player->colsWithX(coin);
     
 }
 
-void renderGame(ShaderProgram* program, Entity* player, std::vector<Entity*> woods, Entity* coin){
+void renderGame(ShaderProgram* program, Entity* player, std::vector<Entity*> blocks, Entity* coin){
     player->Render(program, player);
-    for (Entity* woodPtr : woods){
+    for (Entity* woodPtr : blocks){
         woodPtr->Render(program, player);
     }
     
     coin->Render(program, player);
 }
-/*
- void renderMap(ShaderProgram *program, int mapSheet) {
- Matrix modelMatrix;
- program->SetModelMatrix(modelMatrix);
- 
- glBindTexture(GL_TEXTURE_2D, mapSheet);
- glUseProgram(program->programID);
- 
- glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertexData.data());
- glEnableVertexAttribArray(program->positionAttribute);
- 
- glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoordData.data());
- glEnableVertexAttribArray(program->texCoordAttribute);
- 
- glDrawArrays(GL_TRIANGLES, 0, vertexData.size() / 2);
- 
- 
- glDisableVertexAttribArray(program->positionAttribute);
- glDisableVertexAttribArray(program->texCoordAttribute);
- 
- }
- */
+
+void PlaceEntity(string type, float posx, float posy, Entity& ent){
+    if (type == "Enemy") {
+        ent = Entity(posx,posy, .2f, .2f, 80, ENTITY_ENEMY);
+        ent.acceleration.y = -9.8f;
+    }
+}
+
 
 int main(int argc, char *argv[])
 {
+    ifstream ifs("TileMap.txt");
+    //if (!ifs) {
+    //  assert(false);
+    
+    //}
     ShaderProgram program;
     float lastFrameTicks = 0.0f;
     float accumulator = 0.0f;
     
     setup(&program);
     
-    GLuint itemSpriteSheet = LoadTexture(RESOURCE_FOLDER"items_spritesheet.png");
-    GLuint woodSpriteSheet = LoadTexture(RESOURCE_FOLDER"spritesheet_wood.png");
+    GLuint itemSpriteSheet = LoadTexture(RESOURCE_FOLDER"items.png");
+    //GLuint blockSpriteSheet = LoadTexture(RESOURCE_FOLDER"blocks.png");
     GLuint newSpriteSheet = LoadTexture(RESOURCE_FOLDER"arne_sprites.png");
     GLuint playertextureID = LoadTexture(RESOURCE_FOLDER"aliens.png");
     
+    
+    
     SheetSprite itemSheet = SheetSprite(itemSpriteSheet, 288.0f/1024.0f, 432.0f/1024.0f, 70.0f/1024.0f, 70.0f/1024.0f, 0.2);
-    SheetSprite woodSheet = SheetSprite(woodSpriteSheet, 0.0f/1024.0f, 630.0f/1024.0f, 220.0f/1024.0f, 140.0f/1024.0f, 0.2);
+    //SheetSprite blockSheet = SheetSprite(blockSpriteSheet, 0.0f/1024.0f, 630.0f/1024.0f, 220.0f/1024.0f, 140.0f/1024.0f, 0.2);
     SheetSprite playersprite(playertextureID, 67, 196, 66, 92, 0.75, 512, 512);
     
     Entity player(playersprite, -3.35f, -1.0f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -2.0f,ENTITY_PLAYER);
-    player.Draw(&program);
-    //Entity player(playerSheet, -3.35f, -1.0f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, -2.0f, ENTITY_PLAYER);
+    Entity enemy;
     Entity coin(itemSheet, 2.5f, 1.5f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_COIN);
+    
+    player.Draw(&program);
+    //map.Load("TileMap.txt");
+    /*
+     for (size_t i = 0; i < map.entities.size(); i++) {
+     PlaceEntity(map.entities[i].type, map.entities[i].x * TILE_SIZE, map.entities[i].y * -TILE_SIZE, enemy);
+     }
+     */
+    //map.drawMap();
     
     float posX = -1.5f;
     float posY = -1.8f;
     
-    std::vector<Entity*> woods;
-    
-    for (size_t i=0; i<5; i++){
-        Entity* newWoodPtr = new Entity(woodSheet, posX, posY, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
-        woods.push_back(newWoodPtr);
-        posX += 0.8f;
-        posY += 0.7f;
-    }
+    std::vector<Entity*> blocks;
+    /*
+     for (size_t i=0; i<5; i++){
+     Entity* newBlockPtr = new Entity(blockSheet, posX, posY, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
+     blocks.push_back(newBlockPtr);
+     posX += 0.8f;
+     posY += 0.7f;
+     }
+     */
     
     SDL_Event event;
     bool done = false;
@@ -508,12 +474,12 @@ int main(int argc, char *argv[])
         glClear(GL_COLOR_BUFFER_BIT);
         
         while(elapsed >= FIXED_TIMESTEP) {
-            updateGame(FIXED_TIMESTEP, &player, woods, &coin);
+            updateGame(FIXED_TIMESTEP, &player, blocks, &coin);
             elapsed -= FIXED_TIMESTEP;
         }
         
         accumulator = elapsed;
-        renderGame(&program, &player, woods, &coin);
+        renderGame(&program, &player, blocks, &coin);
         
         SDL_GL_SwapWindow(displayWindow);
     }
