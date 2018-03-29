@@ -71,7 +71,7 @@ public:
         width = spritewidth / sheetwidth;
         height = spriteheight / sheetheight;
     }
-    
+
     
     void Draw(ShaderProgram *program) const {
         
@@ -256,7 +256,7 @@ public:
     }
     
     void Render(ShaderProgram* program, Entity* player){
-        
+
         Matrix projectionMatrix;
         projectionMatrix.SetOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
         Matrix modelMatrix;
@@ -264,9 +264,9 @@ public:
         modelMatrix.Scale(size.x, size.y, size.z);
         
         Matrix viewMatrix;
-        
+
         viewMatrix.Translate(-1.0f*player->position.x, -1.0f*player->position.y, 0.0f);
-        
+
         glUseProgram(program->programID);
         
         program->SetProjectionMatrix(projectionMatrix);
@@ -295,7 +295,7 @@ public:
                     position.x = position.x - Xpen - 0.000001f;
                     colRight = true;
                 }
-                
+    
                 velocity.x = 0.0f;
             }
             return true;
@@ -312,7 +312,7 @@ public:
             }else if(entity->entityType == ENTITY_STATIC){
                 double Ypen = 0.0f;
                 
-                
+
                 Ypen = fabs(fabs(position.y-entity->position.y) - size.y*0.5 - entity->size.y*0.5);
                 
                 if(position.y>entity->position.y){
@@ -329,8 +329,8 @@ public:
             return true;
         }
     }
-    
-    
+
+
 };
 
 void worldToTileCoordinates(float worldX, float worldY, int * gridX, int *gridY) {
@@ -349,7 +349,7 @@ void setup(ShaderProgram* program){
 #endif
     
     glViewport(0, 0, 1280, 720);
-    //    glClearColor(254.0f/255.0f, 223.0f/255.0f, 225.0f/255.0f, 1.0f);
+//    glClearColor(254.0f/255.0f, 223.0f/255.0f, 225.0f/255.0f, 1.0f);
     
     program->Load(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
     
@@ -363,40 +363,45 @@ void processGameInput(SDL_Event* event, bool& done, Entity* player){
             done = true;
         }else if(event->type == SDL_KEYDOWN){
             if(event->key.keysym.scancode == SDL_SCANCODE_UP && player->colBottom == true){
-                player->velocity.y = 2.0f;
+                player->velocity.y = 1.5f;
             }
         }
     }
 }
 
-void updateGame(float elapsed, Entity* player, std::vector<Entity*> blocks, Entity* coin ){
+void updateGame(float elapsed, Entity* player, std::vector<Entity*> blocks, Entity* coin, Entity* coin2 ){
     player->colBottom = false;
     player->colTop = false;
     player->colRight = false;
     player->colLeft = false;
-    
     player->UpdateY(elapsed);
+    
+    player->colsWithX(coin);
+    player->colsWithX(coin2);
+    player->colsWithY(coin);
+    player->colsWithY(coin2);
+    
     for (Entity* blockptr : blocks){
         player->colsWithY(blockptr);
     }
-    player->colsWithY(coin);
+    
     
     
     player->UpdateX(elapsed);
-    for (Entity* woodPtr : blocks){
-        player->colsWithX(woodPtr);
+    for (Entity* blockptr : blocks){
+        player->colsWithX(blockptr);
     }
-    player->colsWithX(coin);
     
 }
 
-void renderGame(ShaderProgram* program, Entity* player, std::vector<Entity*> blocks, Entity* coin){
+void renderGame(ShaderProgram* program, Entity* player, std::vector<Entity*> blocks, Entity* coin, Entity* coin2){
     player->Render(program, player);
-    for (Entity* woodPtr : blocks){
-        woodPtr->Render(program, player);
+    for (Entity* blockptr : blocks){
+        blockptr->Render(program, player);
     }
-    
+
     coin->Render(program, player);
+    coin2->Render(program, player);
 }
 
 void PlaceEntity(string type, float posx, float posy, Entity& ent){
@@ -406,56 +411,86 @@ void PlaceEntity(string type, float posx, float posy, Entity& ent){
     }
 }
 
+void renderMap(ShaderProgram *program, int mapSheet, vector<float> vertexData, vector<float> texCoordData) {
+    Matrix modelMatrix;
+    program->SetModelMatrix(modelMatrix);
+    
+    glBindTexture(GL_TEXTURE_2D, mapSheet);
+    glUseProgram(program->programID);
+    
+    glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertexData.data());
+    glEnableVertexAttribArray(program->positionAttribute);
+    
+    glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoordData.data());
+    glEnableVertexAttribArray(program->texCoordAttribute);
+    
+    glDrawArrays(GL_TRIANGLES, 0, vertexData.size() / 2);
+    
+    
+    glDisableVertexAttribArray(program->positionAttribute);
+    glDisableVertexAttribArray(program->texCoordAttribute);
+    
+}
+
+
 
 int main(int argc, char *argv[])
 {
-    ifstream ifs("TileMap.txt");
-    //if (!ifs) {
-    //  assert(false);
     
-    //}
     ShaderProgram program;
     float lastFrameTicks = 0.0f;
     float accumulator = 0.0f;
+    std::vector<Entity*> blocks;
     
     setup(&program);
-    
+
     GLuint itemSpriteSheet = LoadTexture(RESOURCE_FOLDER"items.png");
-    //GLuint blockSpriteSheet = LoadTexture(RESOURCE_FOLDER"blocks.png");
+    GLuint blockSpriteSheet = LoadTexture(RESOURCE_FOLDER"blocks.png");
     GLuint newSpriteSheet = LoadTexture(RESOURCE_FOLDER"arne_sprites.png");
     GLuint playertextureID = LoadTexture(RESOURCE_FOLDER"aliens.png");
     
-    
+ 
     
     SheetSprite itemSheet = SheetSprite(itemSpriteSheet, 288.0f/1024.0f, 432.0f/1024.0f, 70.0f/1024.0f, 70.0f/1024.0f, 0.2);
-    //SheetSprite blockSheet = SheetSprite(blockSpriteSheet, 0.0f/1024.0f, 630.0f/1024.0f, 220.0f/1024.0f, 140.0f/1024.0f, 0.2);
+    SheetSprite blockSheet = SheetSprite(blockSpriteSheet, 0.0f/1024.0f, 630.0f/1024.0f, 220.0f/1024.0f, 140.0f/1024.0f, 0.2);
     SheetSprite playersprite(playertextureID, 67, 196, 66, 92, 0.75, 512, 512);
     
     Entity player(playersprite, -3.35f, -1.0f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -2.0f,ENTITY_PLAYER);
     Entity enemy;
-    Entity coin(itemSheet, 2.5f, 1.5f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_COIN);
+    Entity coin(itemSheet, 2.5f, 1.0f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_COIN);
+    Entity coin2(itemSheet, 6.5f, 0.7f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_COIN);
+    Entity* newBlock = new Entity(blockSheet, 6.5f, 0.5f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
+    Entity* newBlock2 = new Entity(blockSheet, 5.8f, -0.5f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
+    Entity* newBlock3 = new Entity(blockSheet, 7.0f, -1.0f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
+    Entity* newBlock4 = new Entity(blockSheet, 7.4f, -0.5f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
+    Entity* newBlock5 = new Entity(blockSheet, 7.6f, 0.0f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
+    blocks.push_back(newBlock);
+    blocks.push_back(newBlock2);
+    blocks.push_back(newBlock3);
+    blocks.push_back(newBlock4);
+    blocks.push_back(newBlock5);
     
     player.Draw(&program);
-    //map.Load("TileMap.txt");
-    /*
-     for (size_t i = 0; i < map.entities.size(); i++) {
-     PlaceEntity(map.entities[i].type, map.entities[i].x * TILE_SIZE, map.entities[i].y * -TILE_SIZE, enemy);
-     }
-     */
-    //map.drawMap();
+    map.Load(RESOURCE_FOLDER"TileMap.txt");
+    
+    for (size_t i = 0; i < map.entities.size(); i++) {
+        PlaceEntity(map.entities[i].type, map.entities[i].x * TILE_SIZE, map.entities[i].y * -TILE_SIZE, enemy);
+    }
+     
+    map.drawMap();
+    renderMap(&program, newSpriteSheet, map.vertexData, map.vertexData);
     
     float posX = -1.5f;
-    float posY = -1.8f;
+    float posY = -1.7f;
     
-    std::vector<Entity*> blocks;
-    /*
-     for (size_t i=0; i<5; i++){
-     Entity* newBlockPtr = new Entity(blockSheet, posX, posY, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
-     blocks.push_back(newBlockPtr);
-     posX += 0.8f;
-     posY += 0.7f;
-     }
-     */
+    
+    
+    for (size_t i=0; i<7; i++){
+        Entity* newBlockPtr = new Entity(blockSheet, posX, posY, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
+        blocks.push_back(newBlockPtr);
+        posX += 0.9f;
+        posY += 0.3f;
+    }
     
     SDL_Event event;
     bool done = false;
@@ -474,12 +509,12 @@ int main(int argc, char *argv[])
         glClear(GL_COLOR_BUFFER_BIT);
         
         while(elapsed >= FIXED_TIMESTEP) {
-            updateGame(FIXED_TIMESTEP, &player, blocks, &coin);
+            updateGame(FIXED_TIMESTEP, &player, blocks, &coin, &coin2);
             elapsed -= FIXED_TIMESTEP;
         }
         
         accumulator = elapsed;
-        renderGame(&program, &player, blocks, &coin);
+        renderGame(&program, &player, blocks, &coin, &coin2);
         
         SDL_GL_SwapWindow(displayWindow);
     }
@@ -487,4 +522,3 @@ int main(int argc, char *argv[])
     SDL_Quit();
     return 0;
 }
-

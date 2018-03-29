@@ -22,8 +22,10 @@ public:
     int mapWidth;
     int mapHeight;
     unsigned int **mapData;
-    std::vector<FlareMapEntity> entities;
     void drawMap();
+    std::vector<FlareMapEntity> entities;
+    std::vector<float> vertexData;
+    std::vector<float> texCoordData;
     
 private:
     

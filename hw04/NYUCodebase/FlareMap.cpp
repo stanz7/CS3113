@@ -3,11 +3,13 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <cassert>
 #define spriteCountX 16
 #define spriteCountY 8
 #define TILE_SIZE 0.5f
+
 
 FlareMap::FlareMap() {
     mapData = nullptr;
@@ -124,10 +126,8 @@ void FlareMap::Load(const std::string fileName) {
     }
 }
 
-
 void FlareMap::drawMap() {
-    std::vector<float> vertexData;
-    std::vector<float> texCoordData;
+    
     
     for (int y = 0; y < mapHeight; y++) {
         for (int x = 0; x < mapWidth; x++) {
@@ -161,3 +161,4 @@ void FlareMap::drawMap() {
         }
     }
 }
+
