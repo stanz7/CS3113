@@ -5,6 +5,14 @@
 #include <SDL_opengl.h>
 #include <SDL_image.h>
 
+/*
+ 
+ 
+ PRESS SPACE TO START GAME
+COLLECT 3 GEMS TO WIN
+ 
+ */
+
 #include <vector>
 #include <iostream>
 #include <string>
@@ -32,7 +40,7 @@ FlareMap map;
 
 SDL_Window* displayWindow;
 
-enum GameMode { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER, STATE_WIN};
+enum GameMode { STATE_MAIN_MENU, STATE_GAME_LEVEL};
 
 
 GLuint LoadTexture(const char* filepath){
@@ -176,6 +184,60 @@ void DrawSprite(ShaderProgram* program, int index){
     
 }
 
+void DrawText(ShaderProgram *program, GLuint fontTexture, string text, float size, float spacing) {
+    
+    float texture_size=1.0/16.0f;
+    std::vector<float> vertexData;
+    std::vector<float> texCoordData;
+    
+    for (int i=0;i<text.size();i++){
+        int spriteIndex = (int)text[i];
+        float texture_x=(float)(spriteIndex%16)/16.0f;
+        float texture_y=(float)(spriteIndex/16)/16.0f;
+        
+        vertexData.insert(vertexData.end(), {
+            ((size+spacing)*i)+(-0.5f*size),0.5f*size,
+            ((size+spacing)*i)+(-0.5f*size),-0.5f*size,
+            ((size+spacing)*i)+(0.5f*size),0.5f*size,
+            ((size+spacing)*i)+(0.5f*size),-0.5f*size,
+            ((size+spacing)*i)+(0.5f*size),0.5f*size,
+            ((size+spacing)*i)+(-0.5f*size),-0.5f*size,
+        });
+        texCoordData.insert(texCoordData.end(), {
+            texture_x,texture_y,
+            texture_x,texture_y+texture_size,
+            texture_x+texture_size,texture_y,
+            texture_x+texture_size,texture_y+texture_size,
+            texture_x+texture_size,texture_y,
+            texture_x,texture_y+texture_size,
+        });
+    }
+    
+    glBindTexture(GL_TEXTURE_2D, fontTexture);
+    
+    
+    for (int i=0;i<text.size()*10;i+=12)
+    {
+        float texCoord[]={
+            texCoordData[i],texCoordData[i+1],texCoordData[i+2],
+            texCoordData[i+3],texCoordData[i+4],texCoordData[i+5],
+            texCoordData[i+6],texCoordData[i+7],texCoordData[i+8]
+        };
+        glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoord);
+        glEnableVertexAttribArray(program->texCoordAttribute);
+        glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertexData.data());
+        glEnableVertexAttribArray(program->positionAttribute);
+        glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoordData.data());
+        glEnableVertexAttribArray(program->texCoordAttribute);
+        glBindTexture(GL_TEXTURE_2D, fontTexture);
+        glDrawArrays(GL_TRIANGLES, 0 , text.size()*6);
+        glDisableVertexAttribArray(program->positionAttribute);
+        glDisableVertexAttribArray(program->texCoordAttribute);
+        
+    }
+    
+}
+
 class Entity{
 public:
     
@@ -206,8 +268,10 @@ public:
         height = 0;
     };
     
-    Entity(const SheetSprite& sprite, float posx, float posy, float sizeX, float sizeY, float velocityX, float velocityY, float accX, float accY, EntityType entityType):sprite(sprite), position(posx, posy, 0.0f), size(sizeX * sprite.size * sprite.width/sprite.height, sizeY * sprite.size, 0.0f), velocity(velocityX, velocityY, 0.0f), acceleration(accX, accY, 0.0f), entityType(entityType){
+    Entity(const SheetSprite& sprite, float posx, float posy, float sizeX, float sizeY, float velX, float velY, float accX, float accY, EntityType entityType):sprite(sprite), position(posx, posy, 0.0f), size(sizeX * sprite.size * sprite.width/sprite.height, sizeY * sprite.size, 0.0f), velocity(velX, velY), acceleration(accX, accY), entityType(entityType){
     };
+    
+    Entity(float positionX, float positionY, float sizeX, float sizeY):position(positionX, positionY, 0.0f), size(sizeX, sizeY,0.0f){};
     
     Entity(float x, float y, float width, float height, int sprite, EntityType entityType)
     : position(x, y), size(width, height), spriteint(sprite), entityType(entityType) {};
@@ -219,16 +283,40 @@ public:
         DrawSprite(program, spriteint);
     }
     
+    void drawInstructions(ShaderProgram* program, GLuint fontTexture, const std::string& text) {
+        Matrix projectionMatrix;
+        Matrix modelMatrix;
+        projectionMatrix.SetOrthoProjection(-4.0f, 8.00f, -0.5f, 8.00f, -1.0f, 2.0f);
+        modelMatrix.Translate(position.x, position.y, position.z);
+        Matrix viewMatrix;
+        program->SetProjectionMatrix(projectionMatrix);
+        program->SetModelMatrix(modelMatrix);
+        program->SetViewMatrix(viewMatrix);
+        DrawText(program, fontTexture, text, size.x, -size.x/5);
+    }
     
-    void UpdateX(float elapsed){
+    void drawTitle(ShaderProgram* program, GLuint fontTexture, const std::string& text) {
+        Matrix projectionMatrix;
+        Matrix modelMatrix;
+        projectionMatrix.SetOrthoProjection(-5.65f, 8.90f, -4.0f, 2.0f, -2.0f, 1.0f);
+        modelMatrix.Translate(position.x, position.y, position.z);
+        Matrix viewMatrix;
+        program->SetProjectionMatrix(projectionMatrix);
+        program->SetModelMatrix(modelMatrix);
+        program->SetViewMatrix(viewMatrix);
+        DrawText(program, fontTexture, text, size.x, -size.x/5);
+    }
+    
+    
+    void checkX(float elapsed){
         
         if(entityType == ENTITY_PLAYER){
             const Uint8 *keys = SDL_GetKeyboardState(NULL);
             
-            if(keys[SDL_SCANCODE_RIGHT]){
-                acceleration.x = 2.5f;
-            }else if(keys[SDL_SCANCODE_LEFT]){
-                acceleration.x = -2.5f;
+            if(keys[SDL_SCANCODE_LEFT]){
+                acceleration.x = -2.75f;
+            }else if(keys[SDL_SCANCODE_RIGHT]){
+                acceleration.x = 2.75f;
             }else{
                 acceleration.x = 0.0f;
             }
@@ -240,10 +328,9 @@ public:
         }
     }
     
-    void UpdateY(float elapsed){
+    void checkY(float elapsed){
         if(entityType == ENTITY_PLAYER){
             acceleration.y = -2.0f;
-            
             velocity.y += acceleration.y * elapsed;
             position.y += velocity.y * elapsed;
             
@@ -278,16 +365,14 @@ public:
     
     bool colsWithX(Entity* entity){
         
-        if(position.x+size.x*0.5 < entity->position.x-entity->size.x*0.5 || position.x-size.x*0.5 > entity->position.x+entity->size.x*0.5|| position.y+size.y*0.5 < entity->position.y-entity->size.y*0.5 || position.y-size.y*0.5 > entity->position.y+entity->size.y*0.5){
+        if(position.x + size.x*0.5 < (entity->position.x - entity->size.x*0.5) || position.x - size.x * 0.5 > entity->position.x + entity->size.x * 0.5|| position.y + size.y * 0.5 < entity->position.y - entity->size.y * 0.5 || position.y - size.y * 0.5 > entity->position.y +entity->size.y * 0.5)
+        {
             return false;
-        }else{
-            if(entity->entityType == ENTITY_COIN){
-                entity->position.x = -2000.0f;
-            }else if(entity->entityType == ENTITY_STATIC){
+        }
+        else{
+            if(entity->entityType == ENTITY_STATIC) {
                 double Xpen = 0.0f;
-                
                 Xpen = fabs(fabs(position.x-entity->position.x) - size.x*0.5 - entity->size.x*0.5);
-                
                 if(position.x>entity->position.x){
                     position.x = position.x + Xpen + 0.00001f;
                     colLeft = true;
@@ -295,8 +380,11 @@ public:
                     position.x = position.x - Xpen - 0.000001f;
                     colRight = true;
                 }
-    
+                
                 velocity.x = 0.0f;
+            }
+            else if(entity->entityType == ENTITY_COIN){
+                entity->position.x = -1000.0f;
             }
             return true;
         }
@@ -304,32 +392,30 @@ public:
     
     bool colsWithY(Entity* entity){
         
-        if(position.x+size.x*0.5 < entity->position.x-entity->size.x*0.5 || position.x-size.x*0.5 > entity->position.x+entity->size.x*0.5|| position.y+size.y*0.5 < entity->position.y-entity->size.y*0.5 || position.y-size.y*0.5 > entity->position.y+entity->size.y*0.5){
+        if(position.x + size.x*0.5 < (entity->position.x - entity->size.x*0.5) || position.x - size.x * 0.5 > entity->position.x + entity->size.x * 0.5|| position.y + size.y * 0.5 < entity->position.y - entity->size.y * 0.5 || position.y - size.y * 0.5 > entity->position.y +entity->size.y * 0.5)
+        {
             return false;
-        }else{
-            if(entity->entityType == ENTITY_COIN){
-                entity->position.x = -2000.0f;
-            }else if(entity->entityType == ENTITY_STATIC){
+        }
+        else{
+            if(entity->entityType == ENTITY_STATIC) {
                 double Ypen = 0.0f;
-                
-
-                Ypen = fabs(fabs(position.y-entity->position.y) - size.y*0.5 - entity->size.y*0.5);
-                
-                if(position.y>entity->position.y){
-                    position.y = position.y + Ypen + 0.00001f;
+                Ypen = fabs(fabs(position.y - entity->position.y) - size.y * 0.5 - entity->size.y*0.5);
+                if(position.y > entity->position.y){
+                    position.x = position.x + Ypen + 0.00001f;
                     colBottom = true;
                 }else{
-                    position.y = position.y - Ypen - 0.00001f;
+                    position.y = position.y - Ypen - 0.000001f;
                     colTop = true;
                 }
                 
                 velocity.y = 0.0f;
-                
+            }
+            else if(entity->entityType == ENTITY_COIN){
+                entity->position.x = -1000.0f;
             }
             return true;
         }
     }
-
 
 };
 
@@ -349,7 +435,7 @@ void setup(ShaderProgram* program){
 #endif
     
     glViewport(0, 0, 1280, 720);
-//    glClearColor(254.0f/255.0f, 223.0f/255.0f, 225.0f/255.0f, 1.0f);
+    glClearColor(0.0f, 5.0f, 191.0f, 191.0f);
     
     program->Load(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
     
@@ -369,17 +455,19 @@ void processGameInput(SDL_Event* event, bool& done, Entity* player){
     }
 }
 
-void updateGame(float elapsed, Entity* player, std::vector<Entity*> blocks, Entity* coin, Entity* coin2 ){
+void updateGame(float elapsed, Entity* player, std::vector<Entity*> blocks, Entity* coin, Entity* coin2, Entity* coin3 ){
     player->colBottom = false;
     player->colTop = false;
     player->colRight = false;
     player->colLeft = false;
-    player->UpdateY(elapsed);
+    player->checkY(elapsed);
     
     player->colsWithX(coin);
     player->colsWithX(coin2);
     player->colsWithY(coin);
     player->colsWithY(coin2);
+    player->colsWithX(coin3);
+    player->colsWithY(coin3);
     
     for (Entity* blockptr : blocks){
         player->colsWithY(blockptr);
@@ -387,14 +475,14 @@ void updateGame(float elapsed, Entity* player, std::vector<Entity*> blocks, Enti
     
     
     
-    player->UpdateX(elapsed);
+    player->checkX(elapsed);
     for (Entity* blockptr : blocks){
         player->colsWithX(blockptr);
     }
     
 }
 
-void renderGame(ShaderProgram* program, Entity* player, std::vector<Entity*> blocks, Entity* coin, Entity* coin2){
+void renderGame(ShaderProgram* program, Entity* player, std::vector<Entity*> blocks, Entity* coin, Entity* coin2, Entity* coin3){
     player->Render(program, player);
     for (Entity* blockptr : blocks){
         blockptr->Render(program, player);
@@ -402,6 +490,7 @@ void renderGame(ShaderProgram* program, Entity* player, std::vector<Entity*> blo
 
     coin->Render(program, player);
     coin2->Render(program, player);
+    coin3->Render(program, player);
 }
 
 void PlaceEntity(string type, float posx, float posy, Entity& ent){
@@ -432,10 +521,33 @@ void renderMap(ShaderProgram *program, int mapSheet, vector<float> vertexData, v
     
 }
 
+void ProcessMainMenuInput(SDL_Event* event, bool& done, GameMode& gameMode){
+    while (SDL_PollEvent(event)) {
+        if (event->type == SDL_QUIT || event->type == SDL_WINDOWEVENT_CLOSE) {
+            done = true;
+            
+        }
+        else if(event->type == SDL_KEYDOWN){
+            if(event->key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                gameMode = STATE_GAME_LEVEL;
+            }
+        }
+    }
+}
+
+void RenderMainMenu(ShaderProgram* program, Entity& instr, Entity& title, GLuint fontTexture){
+    
+//}, const SheetSprite& titleImage, Entity& titleImg, Entity& titleImg2){
+    instr.drawInstructions(program, fontTexture, "Press Space to Start");
+    title.drawTitle(program, fontTexture, "PLATFORMER GAME");
+}
+
+
 
 
 int main(int argc, char *argv[])
 {
+    
     
     ShaderProgram program;
     float lastFrameTicks = 0.0f;
@@ -448,17 +560,21 @@ int main(int argc, char *argv[])
     GLuint blockSpriteSheet = LoadTexture(RESOURCE_FOLDER"blocks.png");
     GLuint newSpriteSheet = LoadTexture(RESOURCE_FOLDER"arne_sprites.png");
     GLuint playertextureID = LoadTexture(RESOURCE_FOLDER"aliens.png");
-    
+    GLuint fontTexture = LoadTexture(RESOURCE_FOLDER"font1.png");
  
     
     SheetSprite itemSheet = SheetSprite(itemSpriteSheet, 288.0f/1024.0f, 432.0f/1024.0f, 70.0f/1024.0f, 70.0f/1024.0f, 0.2);
     SheetSprite blockSheet = SheetSprite(blockSpriteSheet, 0.0f/1024.0f, 630.0f/1024.0f, 220.0f/1024.0f, 140.0f/1024.0f, 0.2);
     SheetSprite playersprite(playertextureID, 67, 196, 66, 92, 0.75, 512, 512);
+
     
+    Entity instructions(-1.08f, 0.0f, 0.4f, 0.5f);
+    Entity Title(-1.08f, 0.0f, 0.5f, 0.3f);
     Entity player(playersprite, -3.35f, -1.0f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -2.0f,ENTITY_PLAYER);
     Entity enemy;
-    Entity coin(itemSheet, 2.5f, 1.0f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_COIN);
+    Entity coin(itemSheet, 2.7f, 0.8f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_COIN);
     Entity coin2(itemSheet, 6.5f, 0.7f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_COIN);
+    Entity coin3(itemSheet, 21.0f, 1.4f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_COIN);
     Entity* newBlock = new Entity(blockSheet, 6.5f, 0.5f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
     Entity* newBlock2 = new Entity(blockSheet, 5.8f, -0.5f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
     Entity* newBlock3 = new Entity(blockSheet, 7.0f, -1.0f, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
@@ -483,40 +599,55 @@ int main(int argc, char *argv[])
     float posX = -1.5f;
     float posY = -1.7f;
     
-    
+    float hposX = 9.4f;
+    float hposY = -1.7f;
     
     for (size_t i=0; i<7; i++){
         Entity* newBlockPtr = new Entity(blockSheet, posX, posY, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
+        Entity* newHBlockPtr = new Entity(blockSheet, hposX, hposY, 1.5f, 1.5f, 0.0f, 0.0f, 0.0f, 0.0f, ENTITY_STATIC);
         blocks.push_back(newBlockPtr);
+        blocks.push_back(newHBlockPtr);
         posX += 0.9f;
         posY += 0.3f;
+        hposX += 1.6f;
+        hposY += 0.4f;
     }
     
     SDL_Event event;
     bool done = false;
+    GameMode mode = STATE_MAIN_MENU;
+    RenderMainMenu(&program, instructions, Title, fontTexture);
+
     while (!done) {
+        
         float ticks = (float)SDL_GetTicks()/1000.0f;
         float elapsed = ticks - lastFrameTicks;
         lastFrameTicks = ticks;
         
-        elapsed += accumulator;
-        if(elapsed < FIXED_TIMESTEP) {
-            accumulator = elapsed;
-            continue; }
-        
-        processGameInput(&event, done, &player);
-        
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        while(elapsed >= FIXED_TIMESTEP) {
-            updateGame(FIXED_TIMESTEP, &player, blocks, &coin, &coin2);
-            elapsed -= FIXED_TIMESTEP;
+        if (mode == STATE_MAIN_MENU) {
+            glClearColor(0.0f, 5.0f, 191.0f, 191.0f);
+            ProcessMainMenuInput(&event, done, mode);
         }
-        
-        accumulator = elapsed;
-        renderGame(&program, &player, blocks, &coin, &coin2);
-        
-        SDL_GL_SwapWindow(displayWindow);
+        else {
+            elapsed += accumulator;
+            if(elapsed < FIXED_TIMESTEP) {
+                accumulator = elapsed;
+                continue; }
+            
+            processGameInput(&event, done, &player);
+            
+            glClear(GL_COLOR_BUFFER_BIT);
+            
+            while(elapsed >= FIXED_TIMESTEP) {
+                updateGame(FIXED_TIMESTEP, &player, blocks, &coin , &coin2, &coin3);
+                elapsed -= FIXED_TIMESTEP;
+            }
+            
+            accumulator = elapsed;
+            renderGame(&program, &player, blocks, &coin, &coin2, &coin3);
+            
+            SDL_GL_SwapWindow(displayWindow);
+        }
     }
     
     SDL_Quit();

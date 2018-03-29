@@ -13,6 +13,7 @@
 		3D4721D1206C39B200849CCE /* FlareMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4721CF206C39B200849CCE /* FlareMap.cpp */; };
 		3D4721D9206C854800849CCE /* TileMap.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721D8206C854800849CCE /* TileMap.txt */; };
 		3D4721E2206C97F200849CCE /* aliens.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721E1206C97F200849CCE /* aliens.png */; };
+		3D4721E4206CA52E00849CCE /* font1.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D4721E3206CA52D00849CCE /* font1.png */; };
 		6D5A86AE19AE5C710066C1FD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5A86AD19AE5C710066C1FD /* Cocoa.framework */; };
 		6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D5A86B619AE5C710066C1FD /* InfoPlist.strings */; };
 		6D5A86BA19AE5C710066C1FD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D5A86B919AE5C710066C1FD /* main.cpp */; };
@@ -37,6 +38,7 @@
 		3D4721D0206C39B200849CCE /* FlareMap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FlareMap.hpp; sourceTree = "<group>"; };
 		3D4721D8206C854800849CCE /* TileMap.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TileMap.txt; sourceTree = "<group>"; };
 		3D4721E1206C97F200849CCE /* aliens.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = aliens.png; sourceTree = "<group>"; };
+		3D4721E3206CA52D00849CCE /* font1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font1.png; path = ../../hw03/Xcode/NYUCodebase/font1.png; sourceTree = "<group>"; };
 		6D5A86AA19AE5C710066C1FD /* NYUCodebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NYUCodebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D5A86AD19AE5C710066C1FD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6D5A86B019AE5C710066C1FD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -161,6 +163,7 @@
 				6DEF23BB1B96CC2600BCE792 /* fragment.glsl */,
 				6DE9D2F01BA6AB8C002D599C /* fragment_textured.glsl */,
 				6DC707691BA7273500225B7D /* vertex_textured.glsl */,
+				3D4721E3206CA52D00849CCE /* font1.png */,
 				3D4721CB206C391400849CCE /* arne_sprites.png */,
 				6DEF23BC1B96CC2600BCE792 /* Matrix.cpp */,
 				6DEF23BD1B96CC2600BCE792 /* Matrix.h */,
@@ -238,6 +241,7 @@
 				6DE9D2F11BA6AB8C002D599C /* fragment_textured.glsl in Resources */,
 				6D5A86C619AE5C710066C1FD /* Images.xcassets in Resources */,
 				6D5A86BE19AE5C710066C1FD /* Credits.rtf in Resources */,
+				3D4721E4206CA52E00849CCE /* font1.png in Resources */,
 				3D4721D9206C854800849CCE /* TileMap.txt in Resources */,
 				059EDA442062F98F0023F4CD /* blocks.png in Resources */,
 				6DEF23C41B96CC2600BCE792 /* vertex.glsl in Resources */,
