@@ -205,6 +205,8 @@ class Vector3{
 public:
     Vector3(float x, float y, float z):x(x), y(y), z(z){};
     
+    Vector3() : x(0.0f), y(0.0f), z(0.0f) {};
+    
     Vector3 operator*(const Matrix& mat) {
         Vector3 newv(0.0f, 0.0f, 0.0f);
         
@@ -226,7 +228,29 @@ class Entity{
 public:
     Entity(float positionX, float positionY, float sizeX, float sizeY):position(positionX, positionY, 0.0f), size(sizeX, sizeY,0.0f){};
     
-    Entity(float positionX, float positionY, float sizeX, float sizeY, EntityType type):position(positionX, positionY, 0.0f), size(sizeX, sizeY,0.0f), entityType(type){};
+    Entity(float positionX, float positionY, float sizeX, float sizeY, EntityType type):position(positionX, positionY, 0.0f), size(sizeX, sizeY,0.0f), entityType(type){
+        
+        Vector3 topLeft;
+        Vector3 topRight;
+        Vector3 botLeft;
+        Vector3 botRight;
+        botRight.x = 0.5f * this->size.x;
+        botLeft.x = -0.5f * this->size.y;
+        botRight.y = -0.5f * this->size.y;
+        botLeft.y = -0.5 * this->size.y;
+        
+        topRight.x = 0.5f * this->size.x;
+        topLeft.x = -0.5f * this->size.x;
+        topRight.y = -0.5f * this->size.y;
+        topLeft.y = 0.5 * this->size.y;
+        
+        this->points.push_back(topLeft);
+        this->points.push_back(topRight);
+        this->points.push_back(botLeft);
+        this->points.push_back(botRight);
+        
+        //points.push_back(
+    };
     
     void drawWords(ShaderProgram* program, GLuint fontTexture, const std::string& text){
         Matrix projectionMatrix;
@@ -327,12 +351,6 @@ public:
         std::vector<std::pair<float,float>> point1;
         std::vector<std::pair<float,float>> point2;
         
-        std::vector<Vector3> points;
-        points.push_back(Vector3(-0.1f, -0.1f, 0.0f));
-        points.push_back(Vector3(0.1f, 0.1f, 0.0f));
-        points.push_back(Vector3(-0.1f, 0.1f, 0.0f));
-        points.push_back(Vector3(0.1f, -0.1f, 0.0f));
-        
         
         for(int i=0; i < points.size(); i++) {
             Vector3 point = points[i]*matrix;
@@ -361,8 +379,7 @@ public:
         return collided;
     
     }
-        
-        
+    
     Vector3 position;
     Vector3 size;
     float yVelocity;
@@ -371,8 +388,10 @@ public:
     bool colBottom;
     bool colLeft;
     bool colRight;
+                         
     EntityType entityType;
     Matrix matrix;
+    std::vector<Vector3> points;
     
 };
 
@@ -568,9 +587,11 @@ int main(int argc, char *argv[])
         Entity titleim(-1.0f, -1.3f, 1.5f, 1.5f);
         Entity titleim2(1.0f, -1.3f, 1.5f, 1.5f);
         Entity newEnemy(-3.55f*0.2*1.5f+1.0f, 0.3f, 1.5f, 1.5f, ENTITY_STATIC);
+        Entity newEnemy2(-3.55f*0.2*1.5f+1.0f, 0.1f, 1.5f, 1.5f, ENTITY_STATIC);
         std::vector<Entity> aliens;
     
-    aliens.push_back(newEnemy);
+        aliens.push_back(newEnemy);
+    aliens.push_back(newEnemy2);
         
         float initialX = -3.55f*0.2*1.5f;
         float initialY = 1.8f;
