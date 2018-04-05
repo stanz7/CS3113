@@ -322,7 +322,7 @@ public:
                 
                 sprite.Draw(program);
     }
-    void Draw(ShaderProgram* program, const SheetSprite& sprite) const {
+    void Draw(ShaderProgram* program, const SheetSprite& sprite) {
         Matrix projectionMatrix;
         projectionMatrix.SetOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
         matrix.Identity();
@@ -335,6 +335,7 @@ public:
         glUseProgram(program->programID);
         program->SetProjectionMatrix(projectionMatrix);
         //program->SetModelMatrix(modelMatrix);
+        program->SetModelMatrix(matrix);
         program->SetViewMatrix(viewMatrix);
         sprite.Draw(program);
         
@@ -533,7 +534,7 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, float elapsed, Game
         
 }
 
-void RenderGame(ShaderProgram* program, const std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, const Entity& player, const SheetSprite& bulletSprite, const SheetSprite& EnemySprite2){
+void RenderGame(ShaderProgram* program, std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, Entity& player, const SheetSprite& bulletSprite, const SheetSprite& EnemySprite2){
         
         
     for(size_t i=0; i<aliens.size(); i++){
@@ -603,11 +604,12 @@ int main(int argc, char *argv[])
         Entity titleim2(1.0f, -1.3f, 1.5f, 1.5f);
         Entity newEnemy(-3.55f*0.2*1.5f+1.0f, 0.3f, 1.5f, 1.5f, ENTITY_STATIC);
         Entity newEnemy2(-3.55f*0.2*1.5f+1.0f, 0.1f, 1.5f, 1.5f, ENTITY_STATIC);
+        Entity newEnemy3(-3.55f*0.2*1.5f, 0.1f, 1.5f, 1.5f, ENTITY_STATIC);
         std::vector<Entity> aliens;
     
         aliens.push_back(newEnemy);
     aliens.push_back(newEnemy2);
-        
+        aliens.push_back(newEnemy3);
         float initialX = -3.55f*0.2*1.5f;
         float initialY = 1.8f;
     
