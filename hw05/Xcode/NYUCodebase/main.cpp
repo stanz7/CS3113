@@ -23,6 +23,7 @@
 
 
 SDL_Window* displayWindow;
+#define FIXED_TIMESTEP 0.0166666f
 
 enum GameMode {STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER, STATE_WIN};
 
@@ -230,19 +231,33 @@ public:
     
     Entity(float positionX, float positionY, float sizeX, float sizeY, EntityType type):position(positionX, positionY, 0.0f), size(sizeX, sizeY,0.0f), entityType(type){
         
+        float width;
+        float height;
+        if (type = ENTITY_STATIC) {
+            width = 0.5f * 0.2 * ((93.0f/1024.0f)/ (84.0f/1024.0f)) * 2.0f;
+            height = 0.5f * 0.2 * 2.0f;
+        }
+        else if (type = ENTITY_PLAYER) {
+            width = 0.264f;
+            height = 0.2f;
+        }
+            
         Vector3 topLeft;
         Vector3 topRight;
         Vector3 botLeft;
         Vector3 botRight;
-        botRight.x = 0.5f * this->size.x;
-        botLeft.x = -0.5f * this->size.y;
-        botRight.y = -0.5f * this->size.y;
-        botLeft.y = -0.5 * this->size.y;
+                                        
+        float aspect = width / height;
         
-        topRight.x = 0.5f * this->size.x;
-        topLeft.x = -0.5f * this->size.x;
-        topRight.y = -0.5f * this->size.y;
-        topLeft.y = 0.5 * this->size.y;
+        botRight.x = 0.5f * 0.2 * aspect;
+        botLeft.x = -0.5f * 0.2 * aspect;
+        botRight.y = -0.5f * 0.2 * aspect;
+        botLeft.y = -0.5 * 0.2 * aspect;
+        
+        topRight.x = 0.5f * 0.2 * aspect;
+        topLeft.x = -0.5f * 0.2 * aspect;
+        topRight.y = -0.5f * 0.2 * aspect;
+        topLeft.y = 0.5 * 0.2 * aspect;
         
         this->points.push_back(topLeft);
         this->points.push_back(topRight);
@@ -310,13 +325,16 @@ public:
     void Draw(ShaderProgram* program, const SheetSprite& sprite) const {
         Matrix projectionMatrix;
         projectionMatrix.SetOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
-        Matrix modelMatrix;
-        modelMatrix.Translate(position.x, position.y, position.z);
-        modelMatrix.Scale(size.x, size.y, size.z);
+        matrix.Identity();
+        matrix.Translate(position.x, position.y, position.z);
+        matrix.Scale(size.x, size.y, size.z);
+        //Matrix modelMatrix;
+        //modelMatrix.Translate(position.x, position.y, position.z);
+        //modelMatrix.Scale(size.x, size.y, size.z);
         Matrix viewMatrix;
         glUseProgram(program->programID);
         program->SetProjectionMatrix(projectionMatrix);
-        program->SetModelMatrix(modelMatrix);
+        //program->SetModelMatrix(modelMatrix);
         program->SetViewMatrix(viewMatrix);
         sprite.Draw(program);
         
@@ -343,9 +361,10 @@ public:
     
     bool SatCollision(Entity& entity){
         
-        matrix.Identity();
-        matrix.Translate(position.x, position.y, position.z);
-        matrix.Scale(size.x, size.y, size.z);
+        //matrix.Identity();
+        //matrix.Translate(position.x, position.y, position.z);
+        //matrix.Scale(size.x, size.y, size.z);
+        
         
         std::pair<float,float> penetration;
         std::vector<std::pair<float,float>> point1;
@@ -369,10 +388,6 @@ public:
             position.y += (penetration.second * 0.5f);
             entity.position.x -= (penetration.first * 0.5f);
             entity.position.y -= (penetration.second * 0.5f);
-            for (Vector3& v : points) {
-                v.x +=(penetration.first * 0.5f);
-                v.y += (penetration.second * 0.5f);
-            }
             
         }
 
