@@ -359,7 +359,7 @@ void ProcessGameInput(SDL_Event* event, bool& done, std::vector<Entity>& bullets
                     }
                 else if (event->type == SDL_KEYDOWN){
                     if(event->key.keysym.scancode == SDL_SCANCODE_UP){
-                        bullets[bulletTotal].position.y = player.position.y + 0.1;
+                            bullets[bulletTotal].position.y = player.position.y + 0.1;
                         bullets[bulletTotal].position.x = player.position.x;
                         bullets[bulletTotal].yVelocity = 4.0f;
                         bulletTotal++;
@@ -543,20 +543,19 @@ void RenderMainMenu(ShaderProgram* program, Entity& font, Entity& font2, Entity&
 
 
 
-int main(int argc, char *argv[])
-{
-        ShaderProgram program;
-        setup(&program);
-        
-        GLuint fontTexture = LoadTexture(RESOURCE_FOLDER"font1.png");
-        GLuint spriteSheetTexture = LoadTexture(RESOURCE_FOLDER"sheet.png");
-        
-
+int main(int argc, char *argv[]){
+    ShaderProgram program;
+    setup(&program);
+    
+    GLuint fontTexture = LoadTexture(RESOURCE_FOLDER"font1.png");
+    GLuint spriteSheetTexture = LoadTexture(RESOURCE_FOLDER"sheet.png");
+    
+    
         SheetSprite EnemySprite = SheetSprite(spriteSheetTexture, 425.0f/1024.0f, 468.0f/1024.0f, 93.0f/1024.0f, 84.0f/1024.0f, 0.2);
         SheetSprite playerSprite = SheetSprite(spriteSheetTexture, 247.0f/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
         SheetSprite BulletSprite = SheetSprite(spriteSheetTexture, 842.0f/1024.0f, 230.0f/1024.0f, 9.0f/1024.0f, 54.0f/1024.0f, 0.2);
-        SheetSprite titleSprite = SheetSprite(spriteSheetTexture, 247.0/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
-        SheetSprite EnemySprite2 = SheetSprite(spriteSheetTexture, 230.0f/1024.0f, 530.0f/1024.0f, 100.0f/1024.0f, 140.0f/1024.0f, 0.2);
+    SheetSprite titleSprite = SheetSprite(spriteSheetTexture, 247.0/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
+    SheetSprite EnemySprite2 = SheetSprite(spriteSheetTexture, 230.0f/1024.0f, 530.0f/1024.0f, 100.0f/1024.0f, 140.0f/1024.0f, 0.2);
         
         float lastFrameTicks = 0.0f;
         
@@ -567,9 +566,9 @@ int main(int argc, char *argv[])
         GameMode mode = STATE_MAIN_MENU;
         Entity font(-1.08f, 0.0f, 0.3f, 0.3f);
         Entity player(01.0f, -1.3f, 1.5f, 1.5f);
-        Entity font2(-1.08f, 0.0f, 0.4f, 0.5f);
+    Entity font2(-1.08f, 0.0f, 0.4f, 0.5f);
         Entity font3(-1.08f, 0.0f, 0.5f, 0.3f);
-        Entity titleim(-1.0f, -1.3f, 1.5f, 1.5f);
+    Entity titleim(-1.0f, -1.3f, 1.5f, 1.5f);
         Entity titleim2(1.0f, -1.3f, 1.5f, 1.5f);
         
         std::vector<Entity> aliens;
