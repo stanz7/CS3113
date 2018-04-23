@@ -377,7 +377,7 @@ public:
                     position.x = position.x + Xpen + 0.00001f;
                     colLeft = true;
                 }else{
-                    position.x = position.x - Xpen - 0.000001f;
+                    position.x = position.x - Xpen - 0.00001f;
                     colRight = true;
                 }
                 
@@ -401,7 +401,7 @@ public:
                 double Ypen = 0.0f;
                 Ypen = fabs(fabs(position.y - entity->position.y) - size.y * 0.5 - entity->size.y*0.5);
                 if(position.y > entity->position.y){
-                    position.x = position.x + Ypen + 0.00001f;
+                    position.y = position.y + Ypen + 0.00001f;
                     colBottom = true;
                 }else{
                     position.y = position.y - Ypen - 0.000001f;
