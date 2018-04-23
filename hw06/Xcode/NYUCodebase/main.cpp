@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 
 #include <vector>
 #include "Matrix.h"
@@ -350,19 +351,27 @@ void setup(ShaderProgram* program){
         
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 4096 );
+        Mix_Music *music;
+        music = Mix_LoadMUS("winter.mp3");
+    
+        Mix_VolumeMusic(30);
+        Mix_PlayMusic(music, -1);
 }
 
-void ProcessGameInput(SDL_Event* event, bool& done, std::vector<Entity>& bullets, const Entity& player){
+void ProcessGameInput(SDL_Event* event, bool& done, std::vector<Entity>& bullets, const Entity& player, Mix_Chunk *shot){
         while (SDL_PollEvent(event)){
                 if(event->type == SDL_QUIT || event->type == SDL_WINDOWEVENT_CLOSE){
                         done = true;
                     }
                 else if (event->type == SDL_KEYDOWN){
                     if(event->key.keysym.scancode == SDL_SCANCODE_UP){
-                            bullets[bulletTotal].position.y = player.position.y + 0.1;
+                        bullets[bulletTotal].position.y = player.position.y + 0.1;
                         bullets[bulletTotal].position.x = player.position.x;
                         bullets[bulletTotal].yVelocity = 4.0f;
                         bulletTotal++;
+                        //Mix_PlayMusic(shot, 1);
+                        Mix_PlayChannel(1, shot, 0);
                         if(bulletTotal > MAX_BULLETS-1) {
                          bulletTotal = 0;
                         }
@@ -408,7 +417,7 @@ void random(std::vector<Entity>& aliens, std::vector<Entity>& bullets) {
         }
     }
 }
-void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>& bullets, float elapsed, GameMode& gameMode){
+void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>& bullets, float elapsed, GameMode& gameMode, Mix_Chunk *explosionSound, Mix_Chunk *enemyShot){
     
     timer += elapsed;
         
@@ -454,6 +463,7 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
         
      if(timer >= 2.1f){
         random(aliens, bullets);
+        Mix_PlayChannel(-1, enemyShot, 0);
         timer -= 2.1f;
             }
         
@@ -468,7 +478,7 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
                 if(bullets[i].yVelocity >= 0){
                     bullets[i].position.x = -200.0f;
                     aliens[j].position.x = -200.0f;
-                    
+                    Mix_PlayChannel(-1, explosionSound, 0);
                 }
                 
             }
@@ -476,6 +486,7 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
             if(bullet.position.x+bullet.size.x*0.2*0.4 < player.position.x-player.size.x*0.2*0.4 || bullet.position.x-bullet.size.x*0.2*0.4 > player.position.x+player.size.x*0.2*0.4 || bullet.position.y+bullet.size.y*0.2*0.4 < player.position.y-player.size.y*0.2*0.4 || bullet.position.y-bullet.size.y*0.2*0.4 > player.position.y+player.size.y*0.2*0.4){}
             else{
                 if(bullets[i].yVelocity <= 0){
+                    Mix_PlayChannel(-1, explosionSound, 0);
                     gameMode = STATE_GAME_OVER;
                     
                 }
@@ -550,26 +561,31 @@ int main(int argc, char *argv[]){
     GLuint fontTexture = LoadTexture(RESOURCE_FOLDER"font1.png");
     GLuint spriteSheetTexture = LoadTexture(RESOURCE_FOLDER"sheet.png");
     
+    Mix_Chunk *shotSound;
+    shotSound = Mix_LoadWAV("shot.wav");
     
-        SheetSprite EnemySprite = SheetSprite(spriteSheetTexture, 425.0f/1024.0f, 468.0f/1024.0f, 93.0f/1024.0f, 84.0f/1024.0f, 0.2);
-        SheetSprite playerSprite = SheetSprite(spriteSheetTexture, 247.0f/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
-        SheetSprite BulletSprite = SheetSprite(spriteSheetTexture, 842.0f/1024.0f, 230.0f/1024.0f, 9.0f/1024.0f, 54.0f/1024.0f, 0.2);
+    Mix_Chunk *deathSound;
+    deathSound = Mix_LoadWAV("explode.wav");
+    
+    Mix_Chunk *enemyShotSound;
+    enemyShotSound = Mix_LoadWAV("enemyShot.wav");
+    
+    SheetSprite EnemySprite = SheetSprite(spriteSheetTexture, 425.0f/1024.0f, 468.0f/1024.0f, 93.0f/1024.0f, 84.0f/1024.0f, 0.2);
+    SheetSprite playerSprite = SheetSprite(spriteSheetTexture, 247.0f/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
+    SheetSprite BulletSprite = SheetSprite(spriteSheetTexture, 842.0f/1024.0f, 230.0f/1024.0f, 9.0f/1024.0f, 54.0f/1024.0f, 0.2);
     SheetSprite titleSprite = SheetSprite(spriteSheetTexture, 247.0/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
     SheetSprite EnemySprite2 = SheetSprite(spriteSheetTexture, 230.0f/1024.0f, 530.0f/1024.0f, 100.0f/1024.0f, 140.0f/1024.0f, 0.2);
         
-        float lastFrameTicks = 0.0f;
-        
-        
-        SDL_Event event;
-        bool done = false;
-        
-        GameMode mode = STATE_MAIN_MENU;
-        Entity font(-1.08f, 0.0f, 0.3f, 0.3f);
-        Entity player(01.0f, -1.3f, 1.5f, 1.5f);
+    float lastFrameTicks = 0.0f;
+    SDL_Event event;
+    bool done = false;
+    GameMode mode = STATE_MAIN_MENU;
+    Entity font(-1.08f, 0.0f, 0.3f, 0.3f);
+    Entity player(01.0f, -1.3f, 1.5f, 1.5f);
     Entity font2(-1.08f, 0.0f, 0.4f, 0.5f);
-        Entity font3(-1.08f, 0.0f, 0.5f, 0.3f);
+    Entity font3(-1.08f, 0.0f, 0.5f, 0.3f);
     Entity titleim(-1.0f, -1.3f, 1.5f, 1.5f);
-        Entity titleim2(1.0f, -1.3f, 1.5f, 1.5f);
+    Entity titleim2(1.0f, -1.3f, 1.5f, 1.5f);
         
         std::vector<Entity> aliens;
         
@@ -601,7 +617,7 @@ int main(int argc, char *argv[]){
                 if(mode == STATE_MAIN_MENU){
                         ProcessMainMenuInput(&event, done, mode);
                     }else if(mode == STATE_GAME_LEVEL){
-                            ProcessGameInput(&event, done, bullets, player);
+                            ProcessGameInput(&event, done, bullets, player, shotSound);
                         }else if(mode == STATE_GAME_OVER){
                                 ProcessGameOverInput(&event, done, mode);
                             }else if(mode == STATE_WIN){
@@ -614,7 +630,7 @@ int main(int argc, char *argv[]){
                 if(mode == STATE_MAIN_MENU){
                         RenderMainMenu(&program, font, font2, font3, fontTexture, titleSprite, titleim, titleim2);
                     }else if(mode == STATE_GAME_LEVEL){
-                            UpdateGame(aliens, player, bullets, elapsed, mode);
+                            UpdateGame(aliens, player, bullets, elapsed, mode, deathSound, enemyShotSound);
                             RenderGame(&program, aliens, playerSprite, EnemySprite, player, bullets, BulletSprite, EnemySprite2);
                         }else if(mode == STATE_GAME_OVER){
                                 RenderGameOver(&program, font, font2, fontTexture);
@@ -626,7 +642,7 @@ int main(int argc, char *argv[]){
                 SDL_GL_SwapWindow(displayWindow);
                 
             }
-        
+        Mix_FreeChunk(shotSound);
         SDL_Quit();
         return 0;
 }

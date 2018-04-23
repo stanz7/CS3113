@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		3D33067B204FA337001B9381 /* sheet.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330678204FA337001B9381 /* sheet.png */; };
 		3D33067C204FA337001B9381 /* font1.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330679204FA337001B9381 /* font1.png */; };
+		3DDC8AFA208DA175003A8C16 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDC8AF9208DA175003A8C16 /* SDL2_mixer.framework */; };
+		3DDC8AFC208DA2C4003A8C16 /* winter.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3DDC8AFB208DA2C4003A8C16 /* winter.mp3 */; };
+		3DDC8B00208DA653003A8C16 /* shot.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3DDC8AFF208DA653003A8C16 /* shot.wav */; };
+		3DDC8B02208DA84E003A8C16 /* explode.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3DDC8B01208DA84E003A8C16 /* explode.wav */; };
+		3DDC8B04208DA9B5003A8C16 /* enemyShot.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3DDC8B03208DA9B5003A8C16 /* enemyShot.wav */; };
 		6D5A86AE19AE5C710066C1FD /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5A86AD19AE5C710066C1FD /* Cocoa.framework */; };
 		6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D5A86B619AE5C710066C1FD /* InfoPlist.strings */; };
 		6D5A86BA19AE5C710066C1FD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6D5A86B919AE5C710066C1FD /* main.cpp */; };
@@ -29,6 +34,11 @@
 		3D330677204FA2F2001B9381 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		3D330678204FA337001B9381 /* sheet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sheet.png; sourceTree = "<group>"; };
 		3D330679204FA337001B9381 /* font1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font1.png; sourceTree = "<group>"; };
+		3DDC8AF9208DA175003A8C16 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
+		3DDC8AFB208DA2C4003A8C16 /* winter.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = winter.mp3; sourceTree = "<group>"; };
+		3DDC8AFF208DA653003A8C16 /* shot.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot.wav; sourceTree = "<group>"; };
+		3DDC8B01208DA84E003A8C16 /* explode.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = explode.wav; sourceTree = "<group>"; };
+		3DDC8B03208DA9B5003A8C16 /* enemyShot.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = enemyShot.wav; sourceTree = "<group>"; };
 		6D5A86AA19AE5C710066C1FD /* NYUCodebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NYUCodebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D5A86AD19AE5C710066C1FD /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6D5A86B019AE5C710066C1FD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -60,6 +70,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D5AC2D019AE6280004CB1BF /* OpenGL.framework in Frameworks */,
+				3DDC8AFA208DA175003A8C16 /* SDL2_mixer.framework in Frameworks */,
 				6D5A86AE19AE5C710066C1FD /* Cocoa.framework in Frameworks */,
 				6D5A86E319AE5CD10066C1FD /* SDL2.framework in Frameworks */,
 				6D5AC2D219AE6A1E004CB1BF /* SDL2_image.framework in Frameworks */,
@@ -90,6 +101,7 @@
 		6D5A86AC19AE5C710066C1FD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3DDC8AF9208DA175003A8C16 /* SDL2_mixer.framework */,
 				6D5AC2D119AE6A1E004CB1BF /* SDL2_image.framework */,
 				6D5AC2CF19AE6280004CB1BF /* OpenGL.framework */,
 				6D5A86E219AE5CD10066C1FD /* SDL2.framework */,
@@ -157,8 +169,12 @@
 				6DC707691BA7273500225B7D /* vertex_textured.glsl */,
 				6DEF23BC1B96CC2600BCE792 /* Matrix.cpp */,
 				6DEF23BD1B96CC2600BCE792 /* Matrix.h */,
+				3DDC8B03208DA9B5003A8C16 /* enemyShot.wav */,
 				6DEF23BE1B96CC2600BCE792 /* ShaderProgram.cpp */,
 				6DEF23BF1B96CC2600BCE792 /* ShaderProgram.h */,
+				3DDC8AFF208DA653003A8C16 /* shot.wav */,
+				3DDC8B01208DA84E003A8C16 /* explode.wav */,
+				3DDC8AFB208DA2C4003A8C16 /* winter.mp3 */,
 				6DEF23C01B96CC2600BCE792 /* vertex.glsl */,
 				6D5A86B919AE5C710066C1FD /* main.cpp */,
 			);
@@ -218,6 +234,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DDC8B04208DA9B5003A8C16 /* enemyShot.wav in Resources */,
 				6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */,
 				6DEF23C11B96CC2600BCE792 /* fragment.glsl in Resources */,
 				6DE9D2F11BA6AB8C002D599C /* fragment_textured.glsl in Resources */,
@@ -225,6 +242,9 @@
 				6D5A86C619AE5C710066C1FD /* Images.xcassets in Resources */,
 				6D5A86BE19AE5C710066C1FD /* Credits.rtf in Resources */,
 				3D33067B204FA337001B9381 /* sheet.png in Resources */,
+				3DDC8B00208DA653003A8C16 /* shot.wav in Resources */,
+				3DDC8B02208DA84E003A8C16 /* explode.wav in Resources */,
+				3DDC8AFC208DA2C4003A8C16 /* winter.mp3 in Resources */,
 				6DEF23C41B96CC2600BCE792 /* vertex.glsl in Resources */,
 				6DC7076A1BA7273500225B7D /* vertex_textured.glsl in Resources */,
 			);
@@ -355,6 +375,13 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/Library/Frameworks/SDL2_image.framework/Versions/A/Headers,
+					/Library/Frameworks/SDL2.framework/Versions/A/Headers,
+					/Library/Frameworks/SDL2_mixer.framework/Versions/A/Headers,
+				);
+				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					/Library/Frameworks/SDL2_image.framework/Versions/A/Headers,
