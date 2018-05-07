@@ -759,7 +759,16 @@ void RenderGame(ShaderProgram* program, const std::vector<Entity>& aliens, const
         
 }
 
-void RenderGameLevel2(ShaderProgram* program, const std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, const Entity& player,  const std::vector<Entity>& bullets, const SheetSprite& bulletSprite){
+std::string operator*(const std::string& s, unsigned int n) {
+    std::stringstream out;
+    while (n--)
+        out << s;
+    return out.str();
+}
+
+std::string operator*(unsigned int n, const std::string& s) { return s * n; }
+
+void RenderGameLevel2(ShaderProgram* program, const std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, const Entity& player,  const std::vector<Entity>& bullets, const SheetSprite& bulletSprite, Entity& font2, GLuint fontTexture){
     
     //RenderMap(*program);
     
@@ -772,7 +781,8 @@ void RenderGameLevel2(ShaderProgram* program, const std::vector<Entity>& aliens,
         aliens[i].Draw(program, EnemySprite);
     }
     
-    
+    std::string healthdisp = std::to_string(aliens[0].health);
+    font2.drawWords(program, fontTexture, "Boss Health: " + healthdisp);
     player.Draw(program, PlayerSprite);
         
 }
@@ -836,6 +846,7 @@ int main(int argc, char *argv[]){
     Entity player(01.0f, -1.3f, 1.5f, 1.5f);
     Entity font2(-1.08f, 0.0f, 0.4f, 0.5f);
     Entity font3(-1.08f, 0.0f, 0.5f, 0.3f);
+    Entity healthfont(1.4f, -1.2f, 0.18f, 0.2f);
     Entity titleim(-1.0f, -1.3f, 1.5f, 1.5f);
     Entity titleim2(1.0f, -1.3f, 1.5f, 1.5f);
         
@@ -843,8 +854,8 @@ int main(int argc, char *argv[]){
     float initialX = -3.55f-0.5*0.2*1.5f+1.0f;
     float initialY = 1.8f;
         
-    for(GLsizei j=0; j<5; j++){
-        for(GLsizei i=0; i<7; i++){
+    for(GLsizei j=0; j<1; j++){
+        for(GLsizei i=0; i<1; i++){
             Entity newEnemy(initialX, initialY, 1.5f, 1.5f);
             initialX+=0.5*1.3f;
             aliens.push_back(newEnemy);
@@ -886,7 +897,7 @@ int main(int argc, char *argv[]){
                             RenderGame(&program, aliens, playerSprite, snowmanSprite, player, bullets, BulletSprite, snowmanSprite);
                 }
                 else {
-                    RenderGameLevel2(&program, aliens, playerSprite, yetiSprite, player, bullets, BulletSprite);
+                    RenderGameLevel2(&program, aliens, playerSprite, yetiSprite, player, bullets, BulletSprite, healthfont, fontTexture);
                 }
                         }else if(mode == STATE_GAME_OVER){
                                 RenderGameOver(&program, font, font2, fontTexture);
