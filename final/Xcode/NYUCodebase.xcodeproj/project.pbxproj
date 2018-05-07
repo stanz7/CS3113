@@ -10,6 +10,7 @@
 		3D2F9814209EAA7C00A07875 /* gtiles.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F9813209EAA7C00A07875 /* gtiles.png */; };
 		3D2F9816209EB12300A07875 /* SnowMan.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F9815209EB12300A07875 /* SnowMan.png */; };
 		3D2F9818209EB41500A07875 /* explode.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F9817209EB41500A07875 /* explode.wav */; };
+		3D2F981A209EBF3C00A07875 /* yeti.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F9819209EBF3C00A07875 /* yeti.png */; };
 		3D33067B204FA337001B9381 /* sheet.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330678204FA337001B9381 /* sheet.png */; };
 		3D33067C204FA337001B9381 /* font1.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330679204FA337001B9381 /* font1.png */; };
 		3DDC8AFA208DA175003A8C16 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDC8AF9208DA175003A8C16 /* SDL2_mixer.framework */; };
@@ -36,6 +37,7 @@
 		3D2F9813209EAA7C00A07875 /* gtiles.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gtiles.png; sourceTree = "<group>"; };
 		3D2F9815209EB12300A07875 /* SnowMan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SnowMan.png; sourceTree = "<group>"; };
 		3D2F9817209EB41500A07875 /* explode.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = explode.wav; sourceTree = "<group>"; };
+		3D2F9819209EBF3C00A07875 /* yeti.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = yeti.png; sourceTree = "<group>"; };
 		3D330677204FA2F2001B9381 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		3D330678204FA337001B9381 /* sheet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sheet.png; sourceTree = "<group>"; };
 		3D330679204FA337001B9381 /* font1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font1.png; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 				3DDC8AFF208DA653003A8C16 /* shot.wav */,
 				3D2F9813209EAA7C00A07875 /* gtiles.png */,
 				3DDC8AFB208DA2C4003A8C16 /* winter.mp3 */,
+				3D2F9819209EBF3C00A07875 /* yeti.png */,
 				6DEF23C01B96CC2600BCE792 /* vertex.glsl */,
 				3D2F9815209EB12300A07875 /* SnowMan.png */,
 				6D5A86B919AE5C710066C1FD /* main.cpp */,
@@ -246,6 +249,7 @@
 				6DE9D2F11BA6AB8C002D599C /* fragment_textured.glsl in Resources */,
 				3D33067C204FA337001B9381 /* font1.png in Resources */,
 				3D2F9814209EAA7C00A07875 /* gtiles.png in Resources */,
+				3D2F981A209EBF3C00A07875 /* yeti.png in Resources */,
 				3D2F9816209EB12300A07875 /* SnowMan.png in Resources */,
 				6D5A86C619AE5C710066C1FD /* Images.xcassets in Resources */,
 				6D5A86BE19AE5C710066C1FD /* Credits.rtf in Resources */,
