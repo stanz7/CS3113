@@ -375,6 +375,49 @@ public:
         }
     }
     
+    void bossupdate4(float elapsed) {
+        position.x += elapsed * 2.5f;
+        position.y -= elapsed*0.15f;
+        //position.y -= elapsed * 0.15f;
+        if(position.x >= 3.55+size.x*0.5*0.2){
+            position.x = -3.55f-size.x*0.4*0.2;
+        }
+        if (position.y < -1.0f) {
+            position.y += elapsed * 0.3f;
+        }
+    }
+    
+    void bossupdate5(float elapsed) {
+        position.x -= elapsed * 2.5f;
+        position.y += elapsed * 0.15f;
+        if(position.x >= 3.55+size.x*0.5*0.2){
+            position.x = -3.55f-size.x*0.4*0.2;
+        }
+        if (position.y < -1.0f) {
+            position.y += elapsed * 0.3f;
+        }
+    }
+    
+    void bossupdate6(float elapsed) {
+        position.y -= elapsed * 1.5f;
+        
+        if(position.x >= 3.55+size.x*0.5*0.2){
+            position.x = -3.55f-size.x*0.4*0.2;
+        }
+        if (position.y < -1.0f) {
+            position.y += elapsed * 0.3f;
+        }
+    }
+    
+    void bossupdate7(float elapsed) {
+        position.y += elapsed * 2.0f;
+        if(position.x >= 3.55+size.x*0.5*0.2){
+            position.x = -3.55f-size.x*0.4*0.2;
+        }
+        if (position.y < -1.0f) {
+            position.y += elapsed * 0.3f;
+        }
+    }
     void shootBullets(std::vector<Entity>& bullets){
         bullets[bulletTotal].position.x = position.x;
         bullets[bulletTotal].position.y = position.y - 0.5;
@@ -388,9 +431,39 @@ public:
     }
     
     void shootBossBullets(std::vector<Entity>& bullets) {
-        bullets[bulletTotal].position.x = position.x - 0.5;
+        bullets[bulletTotal].position.x = position.x - 0.6;
         bullets[bulletTotal].position.y = position.y - 0.3;
         bullets[bulletTotal].yVelocity = -1.0f;
+        bulletTotal++;
+        if(bulletTotal > MAX_BULLETS-1) {
+            bulletTotal = 0;
+        }
+    }
+    
+    void shootBossBullets2(std::vector<Entity>& bullets) {
+        bullets[bulletTotal].position.x = position.x + 0.6;
+        bullets[bulletTotal].position.y = position.y - 0.2;
+        bullets[bulletTotal].yVelocity = -1.5f;
+        bulletTotal++;
+        if(bulletTotal > MAX_BULLETS-1) {
+            bulletTotal = 0;
+        }
+    }
+    
+    void shootBossBullets3(std::vector<Entity>& bullets) {
+        bullets[bulletTotal].position.x = position.x - 1.0;
+        bullets[bulletTotal].position.y = position.y - 0.2;
+        bullets[bulletTotal].yVelocity = -1.6f;
+        bulletTotal++;
+        if(bulletTotal > MAX_BULLETS-1) {
+            bulletTotal = 0;
+        }
+    }
+    
+    void shootBossBullets4(std::vector<Entity>& bullets) {
+        bullets[bulletTotal].position.x = position.x + 1.2;
+        bullets[bulletTotal].position.y = position.y - 0.2;
+        bullets[bulletTotal].yVelocity = -1.7f;
         bulletTotal++;
         if(bulletTotal > MAX_BULLETS-1) {
             bulletTotal = 0;
@@ -571,6 +644,31 @@ void setupLevel2(){
     
 }
 
+void setupLevel3(){
+    int esize = aliens.size();
+    for (int j = 0; j < esize; j++) {
+        aliens.pop_back();
+    }
+    int size = bullets.size();
+    for (int i = 0; i < size; i++) {
+        bullets.pop_back();
+    }
+    for(GLsizei i=0; i<MAX_BULLETS; i++){
+                Entity newBullet(-2000.0f, 0.0f, 1.5f, 1.5f);
+                bullets.push_back(newBullet);
+        
+    }
+    
+    float initialX = 0.0f;
+    float initialY = 1.2f;
+    
+    for(GLsizei i=0; i<1; i++){
+        Entity newEnemy(initialX, initialY, 1.5f, 1.5f, 100, 2);
+        aliens.push_back(newEnemy);
+    }
+    
+    
+}
 void random(std::vector<Entity>& aliens, std::vector<Entity>& bullets) {
     srand (time(NULL));
     for (size_t i = 0; i < aliens.size(); i++){
@@ -639,14 +737,24 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
             }
         }
     }
+    
+    if (gameLevel == 2) {
+        else if (timer < 0.65) {
+            aliens[0].bossupdate4(elapsed);
+        }
+        else if (timer > 0.65) {
+            aliens[0].bossupdate5(elapsed);
+        }
+    }
     if (gameLevel == 0 ) {
-        
-     if(timer >= 2.1f){
-        random(aliens, bullets);
-        Mix_PlayChannel(-1, enemyShot, 0);
-        timer -= 2.1f;
-            }
-            }
+            
+         if(timer >= 2.1f){
+            random(aliens, bullets);
+            Mix_PlayChannel(-1, enemyShot, 0);
+            timer -= 2.1f;
+                }
+        
+    }
     
     if (gameLevel == 1) {
         if (timer >= 1.3f) {
@@ -654,6 +762,18 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
             aliens[0].shootBossBullets(bullets);
             Mix_PlayChannel(-1, enemyShot, 0);
             timer -= 1.3f;
+        }
+    }
+    
+    if (gameLevel == 2) {
+        if (timer >= 1.5f) {
+            aliens[0].shootBullets(bullets);
+            aliens[0].shootBossBullets(bullets);
+            aliens[0].shootBossBullets2(bullets);
+            aliens[0].shootBossBullets3(bullets);
+            aliens[0].shootBossBullets4(bullets);
+            Mix_PlayChannel(-1, enemyShot, 0);
+            timer -= 1.5f;
         }
     }
     
@@ -728,6 +848,16 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
     }
     
     if (gameLevel == 1) {
+        if (aliens.size() != 0) {
+            win = false;
+        }
+        else {
+            setupLevel3();
+            gameLevel = 2;
+        }
+    }
+    
+    if (gameLevel == 2) {
         if (aliens.size() != 0) {
             win = false;
         }
@@ -824,14 +954,6 @@ void RenderGame(ShaderProgram* program, const std::vector<Entity>& aliens, const
         
 }
 
-std::string operator*(const std::string& s, unsigned int n) {
-    std::stringstream out;
-    while (n--)
-        out << s;
-    return out.str();
-}
-
-std::string operator*(unsigned int n, const std::string& s) { return s * n; }
 
 void RenderGameLevel2(ShaderProgram* program, const std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, const Entity& player,  const std::vector<Entity>& bullets, const SheetSprite& bulletSprite, Entity& font2, GLuint fontTexture, Entity& scoreFont){
     
@@ -845,6 +967,27 @@ void RenderGameLevel2(ShaderProgram* program, const std::vector<Entity>& aliens,
     for(size_t i=0; i<aliens.size(); i++){
         aliens[i].Draw(program, EnemySprite);
     }
+    std::string scoredisp = std::to_string(score);
+    scoreFont.drawWords(program, fontTexture, "Score: " + scoredisp);
+    std::string healthdisp = std::to_string(aliens[0].health);
+    font2.drawWords(program, fontTexture, "Boss Health: " + healthdisp);
+    player.Draw(program, PlayerSprite);
+        
+}
+
+void RenderGameLevel3(ShaderProgram* program, const std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, const Entity& player,  const std::vector<Entity>& bullets, const SheetSprite& bulletSprite, Entity& font2, GLuint fontTexture, Entity& scoreFont){
+    
+    //RenderMap(*program);
+    
+    
+    for(size_t i=0; i<bullets.size(); i++){
+        bullets[i].Draw(program, bulletSprite);
+        
+    }
+    for(size_t i=0; i<aliens.size(); i++){
+        aliens[i].Draw(program, EnemySprite);
+    }
+    
     std::string scoredisp = std::to_string(score);
     scoreFont.drawWords(program, fontTexture, "Score: " + scoredisp);
     std::string healthdisp = std::to_string(aliens[0].health);
@@ -888,6 +1031,7 @@ int main(int argc, char *argv[]){
     GLuint snowman = LoadTexture(RESOURCE_FOLDER"SnowMan.png");
     GLuint yeti = LoadTexture(RESOURCE_FOLDER"yeti.png");
     GLuint star = LoadTexture(RESOURCE_FOLDER"star.png");
+    GLuint dragon = LoadTexture(RESOURCE_FOLDER"dragon.png");
     
     Mix_Chunk *shotSound;
     shotSound = Mix_LoadWAV("shot.wav");
@@ -902,13 +1046,13 @@ int main(int argc, char *argv[]){
     powerUpSound = Mix_LoadWAV("powerup.wav");
     
     SheetSprite yetiSprite = SheetSprite(yeti, 0, 0, 1, 1, 0.7);
-        SheetSprite playerSprite = SheetSprite(spriteSheetTexture, 247.0f/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
-        SheetSprite BulletSprite = SheetSprite(spriteSheetTexture, 842.0f/1024.0f, 230.0f/1024.0f, 9.0f/1024.0f, 54.0f/1024.0f, 0.2);
+    SheetSprite playerSprite = SheetSprite(spriteSheetTexture, 247.0f/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
+    SheetSprite BulletSprite = SheetSprite(spriteSheetTexture, 842.0f/1024.0f, 230.0f/1024.0f, 9.0f/1024.0f, 54.0f/1024.0f, 0.2);
     SheetSprite titleSprite = SheetSprite(spriteSheetTexture, 247.0/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
     SheetSprite EnemySprite2 = SheetSprite(spriteSheetTexture, 230.0f/1024.0f, 530.0f/1024.0f, 100.0f/1024.0f, 140.0f/1024.0f, 0.2);
     SheetSprite snowmanSprite = SheetSprite(snowman, 0, 0, 1, 1, 0.3);
-    SheetSprite starSprite = SheetSprite(star, 0, 0, 1, 1, 0.1);
-        
+    SheetSprite starSprite = SheetSprite(star, 0, 0, 1, 1, 0.15);
+    SheetSprite dragonSprite = SheetSprite(dragon, 0, 0, 1, 1, 1.0);
     float lastFrameTicks = 0.0f;
     SDL_Event event;
     bool done = false;
@@ -970,10 +1114,13 @@ int main(int argc, char *argv[]){
                     }else if(mode == STATE_GAME_LEVEL){
                             UpdateGame(aliens, player, bullets, elapsed, mode, deathSound, enemyShotSound, stars, powerUpSound);
                 if (gameLevel == 0) {
-                            RenderGame(&program, aliens, playerSprite, snowmanSprite, player, bullets, BulletSprite, snowmanSprite, fontTexture, scorefont, starSprite);
+                                RenderGame(&program, aliens, playerSprite, snowmanSprite, player, bullets, BulletSprite, snowmanSprite, fontTexture, scorefont, starSprite);
                 }
-                else {
+                else if (gameLevel == 1){
                     RenderGameLevel2(&program, aliens, playerSprite, yetiSprite, player, bullets, BulletSprite, healthfont, fontTexture, scorefont);
+                }
+                else if (gameLevel == 2) {
+                    RenderGameLevel2(&program, aliens, playerSprite, dragonSprite, player, bullets, BulletSprite, healthfont, fontTexture, scorefont);
                 }
                         }else if(mode == STATE_GAME_OVER){
                                 RenderGameOver(&program, font, font2, fontTexture);
