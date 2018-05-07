@@ -11,6 +11,8 @@
 		3D2F9816209EB12300A07875 /* SnowMan.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F9815209EB12300A07875 /* SnowMan.png */; };
 		3D2F9818209EB41500A07875 /* explode.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F9817209EB41500A07875 /* explode.wav */; };
 		3D2F981A209EBF3C00A07875 /* yeti.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F9819209EBF3C00A07875 /* yeti.png */; };
+		3D2F981C209FEEFF00A07875 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F981B209FEEFE00A07875 /* star.png */; };
+		3D2F981E209FFC2900A07875 /* powerup.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F981D209FFC2900A07875 /* powerup.wav */; };
 		3D33067B204FA337001B9381 /* sheet.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330678204FA337001B9381 /* sheet.png */; };
 		3D33067C204FA337001B9381 /* font1.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330679204FA337001B9381 /* font1.png */; };
 		3DDC8AFA208DA175003A8C16 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDC8AF9208DA175003A8C16 /* SDL2_mixer.framework */; };
@@ -38,6 +40,8 @@
 		3D2F9815209EB12300A07875 /* SnowMan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SnowMan.png; sourceTree = "<group>"; };
 		3D2F9817209EB41500A07875 /* explode.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = explode.wav; sourceTree = "<group>"; };
 		3D2F9819209EBF3C00A07875 /* yeti.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = yeti.png; sourceTree = "<group>"; };
+		3D2F981B209FEEFE00A07875 /* star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = star.png; sourceTree = "<group>"; };
+		3D2F981D209FFC2900A07875 /* powerup.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = powerup.wav; sourceTree = "<group>"; };
 		3D330677204FA2F2001B9381 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		3D330678204FA337001B9381 /* sheet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sheet.png; sourceTree = "<group>"; };
 		3D330679204FA337001B9381 /* font1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font1.png; sourceTree = "<group>"; };
@@ -170,6 +174,7 @@
 				3D330679204FA337001B9381 /* font1.png */,
 				3D330678204FA337001B9381 /* sheet.png */,
 				3D330677204FA2F2001B9381 /* stb_image.h */,
+				3D2F981D209FFC2900A07875 /* powerup.wav */,
 				6DEF23BB1B96CC2600BCE792 /* fragment.glsl */,
 				6DE9D2F01BA6AB8C002D599C /* fragment_textured.glsl */,
 				6DC707691BA7273500225B7D /* vertex_textured.glsl */,
@@ -184,6 +189,7 @@
 				3DDC8AFB208DA2C4003A8C16 /* winter.mp3 */,
 				3D2F9819209EBF3C00A07875 /* yeti.png */,
 				6DEF23C01B96CC2600BCE792 /* vertex.glsl */,
+				3D2F981B209FEEFE00A07875 /* star.png */,
 				3D2F9815209EB12300A07875 /* SnowMan.png */,
 				6D5A86B919AE5C710066C1FD /* main.cpp */,
 			);
@@ -252,6 +258,7 @@
 				3D2F981A209EBF3C00A07875 /* yeti.png in Resources */,
 				3D2F9816209EB12300A07875 /* SnowMan.png in Resources */,
 				6D5A86C619AE5C710066C1FD /* Images.xcassets in Resources */,
+				3D2F981C209FEEFF00A07875 /* star.png in Resources */,
 				6D5A86BE19AE5C710066C1FD /* Credits.rtf in Resources */,
 				3D33067B204FA337001B9381 /* sheet.png in Resources */,
 				3DDC8B00208DA653003A8C16 /* shot.wav in Resources */,
@@ -259,6 +266,7 @@
 				6DEF23C41B96CC2600BCE792 /* vertex.glsl in Resources */,
 				6DC7076A1BA7273500225B7D /* vertex_textured.glsl in Resources */,
 				3D2F9818209EB41500A07875 /* explode.wav in Resources */,
+				3D2F981E209FFC2900A07875 /* powerup.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
