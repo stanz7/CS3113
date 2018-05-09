@@ -29,8 +29,8 @@ int bulletTotal = 0;
 float timer = 0.0f;
 #define SPRITE_COUNT_X 14
 #define SPRITE_COUNT_Y 7
-#define LEVEL_HEIGHT 17
-#define LEVEL_WIDTH 22
+#define LEVEL_HEIGHT 50
+#define LEVEL_WIDTH 50
 #define TILE_SIZE .15f
 
 int gameLevel = 0;
@@ -38,24 +38,33 @@ int score = 0;
 
 unsigned int levelData[LEVEL_HEIGHT][LEVEL_WIDTH] = {
     
-    { 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 6, 7, 8, 9, 10, 11},
-    { 129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,129,130,131,132,133,134,135 },
-    { 190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,190,191,192,193,194,195,196 },
-    { 190,191,192,193,194,195,196,197,198,199,200,201,202,190,191,192,193,194,195,196,197,198 },
-    { 128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,128,129,130,131,132,133,134 },
-    { 129,130,131,132,133,134,135,136,137,138,139,140,141,129,130,131,132,133,134,135,136,137 },
-    { 190,191,192,193,194,195,196,197,198,199,200,201,202,190,191,192,193,194,195,196,197,198 },
-    { 132,133,134,135,136,137,138,139,140,141,129,130,131,132,133,134,135,136,137,138,139,140 },
-    { 193,194,195,196,197,198,199,200,201,202,190,191,192,193,194,195,196,197,198,199,200,201 },
-    { 132,133,134,135,136,137,138,139,140,141,129,130,131,132,133,134,135,136,137,138,139,140 },
-    { 193,194,195,196,197,198,199,200,201,202,190,191,192,193,194,195,196,197,198,199,200,201 },
-    { 129,130,131,132,133,134,135,136,137,138,139,140,141,129,130,131,132,133,134,135,136,137 },
-    { 190,191,192,193,194,195,196,197,198,199,200,201,202,190,191,192,193,194,195,196,197,198 },
-    { 129,130,131,132,133,134,135,136,137,138,139,140,141,129,130,131,132,133,134,135,136,137 },
-    { 129,130,131,132,133,134,135,136,137,138,139,140,141,129,130,131,132,133,134,135,136,137 },
-    { 190,191,192,193,194,195,196,197,198,199,200,201,202,190,191,192,193,194,195,196,197,198 },
-    { 129,130,131,132,133,134,135,136,137,138,139,140,141,129,130,131,132,133,134,135,136,137 }
     
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+    { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }
 };
 
 
@@ -376,26 +385,15 @@ public:
     }
     
     void bossupdate4(float elapsed) {
-        position.x += elapsed * 2.5f;
+        position.x += elapsed * 2.2f;
         position.y -= elapsed*0.15f;
-        //position.y -= elapsed * 0.15f;
-        if(position.x >= 3.55+size.x*0.5*0.2){
-            position.x = -3.55f-size.x*0.4*0.2;
-        }
-        if (position.y < -1.0f) {
-            position.y += elapsed * 0.3f;
-        }
+
     }
     
     void bossupdate5(float elapsed) {
         position.x -= elapsed * 2.5f;
         position.y += elapsed * 0.15f;
-        if(position.x >= 3.55+size.x*0.5*0.2){
-            position.x = -3.55f-size.x*0.4*0.2;
-        }
-        if (position.y < -1.0f) {
-            position.y += elapsed * 0.3f;
-        }
+
     }
     
     void bossupdate6(float elapsed) {
@@ -443,7 +441,7 @@ public:
     void shootBossBullets2(std::vector<Entity>& bullets) {
         bullets[bulletTotal].position.x = position.x + 0.6;
         bullets[bulletTotal].position.y = position.y - 0.2;
-        bullets[bulletTotal].yVelocity = -1.5f;
+        bullets[bulletTotal].yVelocity = -1.4f;
         bulletTotal++;
         if(bulletTotal > MAX_BULLETS-1) {
             bulletTotal = 0;
@@ -451,7 +449,7 @@ public:
     }
     
     void shootBossBullets3(std::vector<Entity>& bullets) {
-        bullets[bulletTotal].position.x = position.x - 1.0;
+        bullets[bulletTotal].position.x = position.x - 1.3;
         bullets[bulletTotal].position.y = position.y - 0.2;
         bullets[bulletTotal].yVelocity = -1.6f;
         bulletTotal++;
@@ -461,14 +459,20 @@ public:
     }
     
     void shootBossBullets4(std::vector<Entity>& bullets) {
-        bullets[bulletTotal].position.x = position.x + 1.2;
+        bullets[bulletTotal].position.x = position.x + 1.3;
         bullets[bulletTotal].position.y = position.y - 0.2;
         bullets[bulletTotal].yVelocity = -1.7f;
+        bullets[bulletTotal+1].position.x = position.x + 2.0;
+        bullets[bulletTotal+1].position.y = position.y - 0.2;
+        bullets[bulletTotal+1].yVelocity = -1.9f;
+        bulletTotal++;
         bulletTotal++;
         if(bulletTotal > MAX_BULLETS-1) {
             bulletTotal = 0;
         }
     }
+    
+
     
     void releaseStar(std::vector<Entity>& stars) {
         stars[bulletTotal].position.x = position.x;
@@ -512,7 +516,7 @@ void setup(ShaderProgram* program){
     Mix_Music *music;
     music = Mix_LoadMUS("winter.mp3");
     
-    Mix_VolumeMusic(30);
+    Mix_VolumeMusic(80);
     Mix_PlayMusic(music, -1);
 }
 
@@ -663,7 +667,7 @@ void setupLevel3(){
     float initialY = 1.2f;
     
     for(GLsizei i=0; i<1; i++){
-        Entity newEnemy(initialX, initialY, 1.5f, 1.5f, 100, 2);
+        Entity newEnemy(initialX, initialY, 1.5f, 1.5f, 45, 2);
         aliens.push_back(newEnemy);
     }
     
@@ -678,7 +682,7 @@ void random(std::vector<Entity>& aliens, std::vector<Entity>& bullets) {
         }
     }
 }
-void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>& bullets, float elapsed, GameMode& gameMode, Mix_Chunk *explosionSound, Mix_Chunk *enemyShot, std::vector<Entity>& stars, Mix_Chunk *powerupSound){
+void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>& bullets, float elapsed, GameMode& gameMode, Mix_Chunk *explosionSound, Mix_Chunk *enemyShot, std::vector<Entity>& stars, Mix_Chunk *powerupSound, Mix_Chunk *roarSound){
     
     timer += elapsed;
         
@@ -739,10 +743,13 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
     }
     
     if (gameLevel == 2) {
-        else if (timer < 0.65) {
+        if (aliens[0].position.x < -2.0f) {
+            aliens[0].position.x += 1.5f;
+        }
+        else if (timer < 0.75) {
             aliens[0].bossupdate4(elapsed);
         }
-        else if (timer > 0.65) {
+        else if (timer > 0.75) {
             aliens[0].bossupdate5(elapsed);
         }
     }
@@ -750,7 +757,7 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
             
          if(timer >= 2.1f){
             random(aliens, bullets);
-            Mix_PlayChannel(-1, enemyShot, 0);
+            Mix_PlayChannel(-0.5, enemyShot, 0);
             timer -= 2.1f;
                 }
         
@@ -760,7 +767,7 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
         if (timer >= 1.3f) {
             aliens[0].shootBullets(bullets);
             aliens[0].shootBossBullets(bullets);
-            Mix_PlayChannel(-1, enemyShot, 0);
+            Mix_PlayChannel(-0.5, enemyShot, 0);
             timer -= 1.3f;
         }
     }
@@ -772,7 +779,7 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
             aliens[0].shootBossBullets2(bullets);
             aliens[0].shootBossBullets3(bullets);
             aliens[0].shootBossBullets4(bullets);
-            Mix_PlayChannel(-1, enemyShot, 0);
+            Mix_PlayChannel(-0.5, roarSound, 0);
             timer -= 1.5f;
         }
     }
@@ -811,7 +818,7 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
                         aliens[j]= aliens.back();
                         aliens.pop_back();
                     }
-                    Mix_PlayChannel(-1, explosionSound, 0);
+                    Mix_PlayChannel(-0.5, explosionSound, 0);
                 }
                 
             }
@@ -872,7 +879,11 @@ void UpdateGame(std::vector<Entity>& aliens, Entity& player, std::vector<Entity>
 
 void RenderMap(ShaderProgram &program) {
     
-    GLuint mapTexture = LoadTexture("gtiles.png");
+    Matrix modelMatrix;
+    modelMatrix.Translate(-3.55f, 2.0f, 0.0f);
+    program.SetModelMatrix(modelMatrix);
+    
+    GLuint mapTexture = LoadTexture(RESOURCE_FOLDER"gtiles.png");
     glBindTexture(GL_TEXTURE_2D, mapTexture);
     
     
@@ -925,7 +936,7 @@ bool flag = true;
 
 void RenderGame(ShaderProgram* program, const std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, const Entity& player,  const std::vector<Entity>& bullets, const SheetSprite& bulletSprite, const SheetSprite& EnemySprite2, GLuint fontTexture, Entity& scoreFont, const SheetSprite& starSprite){
     
-    //RenderMap(*program);
+    RenderMap(*program);
     
     
     
@@ -957,7 +968,7 @@ void RenderGame(ShaderProgram* program, const std::vector<Entity>& aliens, const
 
 void RenderGameLevel2(ShaderProgram* program, const std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, const Entity& player,  const std::vector<Entity>& bullets, const SheetSprite& bulletSprite, Entity& font2, GLuint fontTexture, Entity& scoreFont){
     
-    //RenderMap(*program);
+    RenderMap(*program);
     
     
     for(size_t i=0; i<bullets.size(); i++){
@@ -977,7 +988,7 @@ void RenderGameLevel2(ShaderProgram* program, const std::vector<Entity>& aliens,
 
 void RenderGameLevel3(ShaderProgram* program, const std::vector<Entity>& aliens, const SheetSprite& PlayerSprite, const SheetSprite& EnemySprite, const Entity& player,  const std::vector<Entity>& bullets, const SheetSprite& bulletSprite, Entity& font2, GLuint fontTexture, Entity& scoreFont){
     
-    //RenderMap(*program);
+    RenderMap(*program);
     
     
     for(size_t i=0; i<bullets.size(); i++){
@@ -999,11 +1010,13 @@ void RenderGameLevel3(ShaderProgram* program, const std::vector<Entity>& aliens,
 
 
 void RenderWin(ShaderProgram* program, Entity& font, Entity& font2, GLuint fontTexture){
+    //RenderMap(*program);
     font.drawWords(program, fontTexture, "You Win!");
     font2.drawInstructions(program, fontTexture, "Press Space to play!");
 }
 
 void RenderGameOver(ShaderProgram* program, Entity& font, Entity& font2, GLuint fontTexture){
+    //RenderMap(*program);
     font.drawWords(program, fontTexture, "Game Over!");
     font2.drawInstructions(program, fontTexture, "press SPACE to retry!");
     
@@ -1011,7 +1024,8 @@ void RenderGameOver(ShaderProgram* program, Entity& font, Entity& font2, GLuint 
 
 
 void RenderMainMenu(ShaderProgram* program, Entity& font, Entity& font2, Entity& font3, GLuint fontTexture, const SheetSprite& titleImage, Entity& titleImg, Entity& titleImg2, const SheetSprite& titleImage2){
-    font.drawWords(program, fontTexture, "Not Really");
+    //font.drawWords(program, fontTexture, "2nd Edition");
+    RenderMap(*program);
     font2.drawInstructions(program, fontTexture, "Press Space to Start");
     font3.drawTitle(program, fontTexture, "SNOW INVADERS");
     titleImg.Draw(program, titleImage);
@@ -1045,6 +1059,8 @@ int main(int argc, char *argv[]){
     Mix_Chunk *powerUpSound;
     powerUpSound = Mix_LoadWAV("powerup.wav");
     
+    Mix_Chunk *roarSound;
+    roarSound = Mix_LoadWAV("rawr.wav");
     SheetSprite yetiSprite = SheetSprite(yeti, 0, 0, 1, 1, 0.7);
     SheetSprite playerSprite = SheetSprite(spriteSheetTexture, 247.0f/1024.0f, 84.0f/1024.0f, 99.0f/1024.0f, 75.0f/1024.0f, 0.2);
     SheetSprite BulletSprite = SheetSprite(spriteSheetTexture, 842.0f/1024.0f, 230.0f/1024.0f, 9.0f/1024.0f, 54.0f/1024.0f, 0.2);
@@ -1112,7 +1128,7 @@ int main(int argc, char *argv[]){
                 if(mode == STATE_MAIN_MENU){
                         RenderMainMenu(&program, font, font2, font3, fontTexture, titleSprite, titleim, titleim2, snowmanSprite);
                     }else if(mode == STATE_GAME_LEVEL){
-                            UpdateGame(aliens, player, bullets, elapsed, mode, deathSound, enemyShotSound, stars, powerUpSound);
+                            UpdateGame(aliens, player, bullets, elapsed, mode, deathSound, enemyShotSound, stars, powerUpSound, roarSound);
                 if (gameLevel == 0) {
                                 RenderGame(&program, aliens, playerSprite, snowmanSprite, player, bullets, BulletSprite, snowmanSprite, fontTexture, scorefont, starSprite);
                 }

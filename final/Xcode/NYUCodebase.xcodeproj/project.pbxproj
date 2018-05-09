@@ -14,6 +14,7 @@
 		3D2F981C209FEEFF00A07875 /* star.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F981B209FEEFE00A07875 /* star.png */; };
 		3D2F981E209FFC2900A07875 /* powerup.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F981D209FFC2900A07875 /* powerup.wav */; };
 		3D2F982020A01BEC00A07875 /* dragon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F981F20A01BEC00A07875 /* dragon.png */; };
+		3D2F982220A288C600A07875 /* rawr.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3D2F982120A288C600A07875 /* rawr.wav */; };
 		3D33067B204FA337001B9381 /* sheet.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330678204FA337001B9381 /* sheet.png */; };
 		3D33067C204FA337001B9381 /* font1.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D330679204FA337001B9381 /* font1.png */; };
 		3DDC8AFA208DA175003A8C16 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDC8AF9208DA175003A8C16 /* SDL2_mixer.framework */; };
@@ -44,6 +45,7 @@
 		3D2F981B209FEEFE00A07875 /* star.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = star.png; sourceTree = "<group>"; };
 		3D2F981D209FFC2900A07875 /* powerup.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = powerup.wav; sourceTree = "<group>"; };
 		3D2F981F20A01BEC00A07875 /* dragon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon.png; sourceTree = "<group>"; };
+		3D2F982120A288C600A07875 /* rawr.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = rawr.wav; path = ../../../../rawr.wav; sourceTree = "<group>"; };
 		3D330677204FA2F2001B9381 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		3D330678204FA337001B9381 /* sheet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sheet.png; sourceTree = "<group>"; };
 		3D330679204FA337001B9381 /* font1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font1.png; sourceTree = "<group>"; };
@@ -190,6 +192,7 @@
 				3DDC8AFF208DA653003A8C16 /* shot.wav */,
 				3D2F9813209EAA7C00A07875 /* gtiles.png */,
 				3DDC8AFB208DA2C4003A8C16 /* winter.mp3 */,
+				3D2F982120A288C600A07875 /* rawr.wav */,
 				3D2F9819209EBF3C00A07875 /* yeti.png */,
 				6DEF23C01B96CC2600BCE792 /* vertex.glsl */,
 				3D2F981B209FEEFE00A07875 /* star.png */,
@@ -252,6 +255,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D2F982220A288C600A07875 /* rawr.wav in Resources */,
 				3DDC8B04208DA9B5003A8C16 /* enemyShot.wav in Resources */,
 				6D5A86B819AE5C710066C1FD /* InfoPlist.strings in Resources */,
 				3D2F982020A01BEC00A07875 /* dragon.png in Resources */,
