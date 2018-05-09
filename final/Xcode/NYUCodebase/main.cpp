@@ -1009,16 +1009,20 @@ void RenderGameLevel3(ShaderProgram* program, const std::vector<Entity>& aliens,
 
 
 
-void RenderWin(ShaderProgram* program, Entity& font, Entity& font2, GLuint fontTexture){
+void RenderWin(ShaderProgram* program, Entity& font, Entity& font2, GLuint fontTexture, Entity& scoreFont){
     //RenderMap(*program);
     font.drawWords(program, fontTexture, "You Win!");
     font2.drawInstructions(program, fontTexture, "Press Space to play!");
+    std::string scoredisp = std::to_string(score);
+    scoreFont.drawWords(program, fontTexture, "Score: " + scoredisp);
 }
 
-void RenderGameOver(ShaderProgram* program, Entity& font, Entity& font2, GLuint fontTexture){
+void RenderGameOver(ShaderProgram* program, Entity& font, Entity& font2, GLuint fontTexture, Entity& scoreFont){
     //RenderMap(*program);
     font.drawWords(program, fontTexture, "Game Over!");
     font2.drawInstructions(program, fontTexture, "press SPACE to retry!");
+    std::string scoredisp = std::to_string(score);
+    scoreFont.drawWords(program, fontTexture, "Score: " + scoredisp);
     
 }
 
@@ -1076,7 +1080,8 @@ int main(int argc, char *argv[]){
     Entity font(-1.08f, 0.0f, 0.3f, 0.3f);
     Entity player(01.0f, -1.3f, 1.5f, 1.5f);
     Entity font2(-1.08f, 0.0f, 0.4f, 0.5f);
-    Entity font3(-1.08f, 0.0f, 0.5f, 0.3f);
+    Entity font3(-1.00f, 0.0f, 0.5f, 0.3f);
+    Entity scoreFontEnd(-1.05, -1.0f, 0.3f, 0.3f);
     Entity healthfont(1.3f, 1.8f, 0.18f, 0.2f);
     Entity titleim(-1.0f, -1.3f, 1.5f, 1.5f);
     Entity titleim2(1.0f, -1.3f, 1.5f, 1.5f);
@@ -1139,9 +1144,9 @@ int main(int argc, char *argv[]){
                     RenderGameLevel2(&program, aliens, playerSprite, dragonSprite, player, bullets, BulletSprite, healthfont, fontTexture, scorefont);
                 }
                         }else if(mode == STATE_GAME_OVER){
-                                RenderGameOver(&program, font, font2, fontTexture);
+                                RenderGameOver(&program, font, font2, fontTexture, scoreFontEnd);
                             }else if(mode == STATE_WIN){
-                                    RenderWin(&program, font, font2, fontTexture);
+                                    RenderWin(&program, font, font2, fontTexture, scoreFontEnd);
                                 }
                 
                 
