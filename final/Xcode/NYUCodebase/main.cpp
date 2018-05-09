@@ -20,6 +20,10 @@
 #define RESOURCE_FOLDER "NYUCodebase.app/Contents/Resources/"
 #endif
 
+//INSTRUCTIONS//
+//UP TO SHOOT
+//LEFT AND RIGHT TO MOVE
+//SPACE TO START/RETRY
 
 
 SDL_Window* displayWindow;
